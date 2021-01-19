@@ -57,6 +57,8 @@ __global__ void use_shared_memory_GPU(float *array)
     // the following code has NO EFFECT: it modifies shared memory, but 
     // the resulting modified data is never copied back to global memory
     // and vanishes when the thread block completes
+    
+    __syncthreads();    // ensure all computations have completed
     sh_arr[index] = 3.14;
 }
 
