@@ -33,7 +33,7 @@
 
 #include "utils.h"
 #include <stdio.h>
-
+using namespace std;
 __global__
 void rgba_to_greyscale(const uchar4* const rgbaImage,
                        unsigned char* const greyImage,
@@ -76,9 +76,16 @@ void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_r
 {
 
   printf ("Rows: %d. Cols: %d\n", numRows, numCols);
+  struct cudaDeviceProp properties;
+  cudaGetDeviceProperties(&properties, device);
+  cout<<"using "<<properties.multiProcessorCount<<" multiprocessors"<<endl;
+  cout<<"max threads per processor: "<<properties.maxThreadsPerMultiProcessor<<endl;
   
   //You must fill in the correct sizes for the blockSize and gridSize
   //currently only one block with one thread is being launched
+
+  
+  
   const dim3 blockSize(numRows, numCols, 1);  //TODO
   const dim3 gridSize( 1, 1, 1);  //TODO
   rgba_to_greyscale<<<gridSize, blockSize>>>(d_rgbaImage, d_greyImage, numRows, numCols);
