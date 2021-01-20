@@ -154,6 +154,8 @@ void gaussian_blur(const unsigned char* const inputChannel,
     }
 
     outputChannel[r * numCols + c] = static_cast<char>(result);
+    if ((r * numCols + c) % 1000 == 0) {
+      printf ("%d %d\n", inputChannel[r * numCols + c] ,outputChannel[r * numCols + c]);
   }
   
 }
@@ -222,9 +224,6 @@ void recombineChannels(const unsigned char* const redChannel,
 
   outputImageRGBA[thread_1D_pos] = outputPixel;
 
-  if (thread_1D_pos % 1000 == 0) {
-    printf ("%d %d %d\n", redChannel [thread_1D_pos], greenChannel [thread_1D_pos], blueChannel [thread_1D_pos]);
-  }
 }
 
 unsigned char *d_red, *d_green, *d_blue;
