@@ -21,7 +21,6 @@ OPENCV_INCLUDEPATH=${shell pkg-config --cflags opencv}
 #OPENCV_INCLUDEPATH=/opt/local/include
 
 OPENCV_LIBS=-lopencv_core -lopencv_imgproc -lopencv_highgui
-
 CUDA_INCLUDEPATH=/usr/local/cuda-10.1/include
 
 ######################################################
