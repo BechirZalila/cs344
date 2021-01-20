@@ -189,6 +189,10 @@ void separateChannels(const uchar4* const inputImageRGBA,
     redChannel [i]   = rgba.x;
     greenChannel [i] = rgba.y;
     blueChannel [i]  = rgba.z;
+
+    if (i == 100) {
+      printf ("%d %d %d\n", redChannel [i], greenChannel [i], blueChannel [i]);
+    }
   }
 }
 
@@ -280,8 +284,6 @@ void your_gaussian_blur
   const int gridWidth = numCols / blkWidth + 1;
   const int gridHeight = numRows / blkHeight + 1;
 
-  printf ("%d\n", filterWidth);
-  
   //TODO: Set reasonable block size (i.e., number of threads per block)
   const dim3 blockSize (blkWidth, blkHeight, 1);
 
@@ -294,7 +296,7 @@ void your_gaussian_blur
   separateChannels<<<gridSize, blockSize>>> (d_inputImageRGBA,
 					     numRows, numCols,
 					     d_red, d_green, d_blue);
-  
+
   // Call cudaDeviceSynchronize(), then call checkCudaErrors() immediately after
   // launching your kernel to make sure that you didn't make any mistakes.
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
