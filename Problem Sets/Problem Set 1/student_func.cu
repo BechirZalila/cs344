@@ -33,7 +33,7 @@
 
 #include "utils.h"
 #include <stdio.h>
-using namespace std;
+
 __global__
 void rgba_to_greyscale(const uchar4* const rgbaImage,
                        unsigned char* const greyImage,
@@ -64,11 +64,16 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
     }
   }
   */
-  int r = threadIdx.x;
-  int c = threadIdx.y;
-  uchar4 rgba = rgbaImage[r * numCols + c];
-  float channelSum = .299f * rgba.x + .587f * rgba.y + .114f * rgba.z;
-  greyImage[r * numCols + c] = channelSum;
+  int r = threadIdx.x + blockIdx.x * blockDim.x;
+  int c = threadIdx.y + blockIdx.y * blockDim.y;
+
+  printf ("r = %d, c = %d\n", r, c);
+
+  if ((r < numRows) && (c < numCols)) {
+    uchar4 rgba = rgbaImage[r * numCols + c];
+    float channelSum = .299f * rgba.x + .587f * rgba.y + .114f * rgba.z;
+    greyImage[r * numCols + c] = channelSum;
+  }
 }
 
 void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_rgbaImage,
@@ -76,18 +81,18 @@ void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_r
 {
 
   printf ("Rows: %d. Cols: %d\n", numRows, numCols);
-  struct cudaDeviceProp properties;
-  cudaGetDeviceProperties(&properties, device);
-  cout<<"using "<<properties.multiProcessorCount<<" multiprocessors"<<endl;
-  cout<<"max threads per processor: "<<properties.maxThreadsPerMultiProcessor<<endl;
   
   //You must fill in the correct sizes for the blockSize and gridSize
   //currently only one block with one thread is being launched
 
+  const int blkWidth = 32; // 1024 threads max per block
+  const int blkHeight = 32; // 1024 threads max per block
+
+  const int gridWidth = numCols / blkWidth + 1;
+  const int gridHeight = numRows / blkHeight + 1;
   
-  
-  const dim3 blockSize(numRows, numCols, 1);  //TODO
-  const dim3 gridSize( 1, 1, 1);  //TODO
+  const dim3 blockSize(blkWidth, blkHeight, 1);  //TODO
+  const dim3 gridSize(gridWidth, gridHeight, 1);  //TODO
   rgba_to_greyscale<<<gridSize, blockSize>>>(d_rgbaImage, d_greyImage, numRows, numCols);
   
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
