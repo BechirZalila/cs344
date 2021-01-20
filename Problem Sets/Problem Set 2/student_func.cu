@@ -156,6 +156,7 @@ void gaussian_blur(const unsigned char* const inputChannel,
     outputChannel[r * numCols + c] = static_cast<char>(result);
     if ((r * numCols + c) % 1000 == 0) {
       printf ("%d %d\n", inputChannel[r * numCols + c] ,outputChannel[r * numCols + c]);
+    }
   }
   
 }
