@@ -68,7 +68,7 @@ void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_r
                             unsigned char* const d_greyImage, size_t numRows, size_t numCols)
 {
 
-  printf ("Rows: %s. Cols: %d\n", numRows, numCols);
+  printf ("Rows: %d. Cols: %d\n", numRows, numCols);
   
   //You must fill in the correct sizes for the blockSize and gridSize
   //currently only one block with one thread is being launched
