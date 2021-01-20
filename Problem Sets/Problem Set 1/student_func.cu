@@ -54,7 +54,8 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
 
   printf ("Grid  Size: %d %d %d\n", gridDim.x, gridDim.y, gridDim.z);
   printf ("Block Size: %d %d %d\n", blockDim.x, blockDim.y, blockDim.z);
-  
+
+  /*
   for (size_t r = 0; r < numRows; ++r) {
     for (size_t c = 0; c < numCols; ++c) {
       uchar4 rgba = rgbaImage[r * numCols + c];
@@ -62,6 +63,12 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
       greyImage[r * numCols + c] = channelSum;
     }
   }
+  */
+  int r = threadIdx.x;
+  int c = threadIdx.y;
+  uchar4 rgba = rgbaImage[r * numCols + c];
+  float channelSum = .299f * rgba.x + .587f * rgba.y + .114f * rgba.z;
+  greyImage[r * numCols + c] = channelSum;
 }
 
 void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_rgbaImage,
@@ -72,7 +79,7 @@ void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_r
   
   //You must fill in the correct sizes for the blockSize and gridSize
   //currently only one block with one thread is being launched
-  const dim3 blockSize(1, 1, 1);  //TODO
+  const dim3 blockSize(numRows, numCols, 1);  //TODO
   const dim3 gridSize( 1, 1, 1);  //TODO
   rgba_to_greyscale<<<gridSize, blockSize>>>(d_rgbaImage, d_greyImage, numRows, numCols);
   
