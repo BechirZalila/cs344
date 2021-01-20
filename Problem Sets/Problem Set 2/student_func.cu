@@ -102,6 +102,9 @@
 
 #include "utils.h"
 
+__device__ int min (int a, int b) {return (a<b) ? a : b;}
+__device__ int max (int a, int b) {return (a>b) ? a : b;}
+
 __global__
 void gaussian_blur(const unsigned char* const inputChannel,
                    unsigned char* const outputChannel,
@@ -143,8 +146,8 @@ void gaussian_blur(const unsigned char* const inputChannel,
       for (int filter_c = -filterWidth/2; filter_c <= filterWidth/2; ++filter_c) {
 	//Find the global image position for this filter position
 	//clamp to boundary of the image
-	int image_r = std::min(std::max(r + filter_r, 0), static_cast<int>(numRows - 1));
-	int image_c = std::min(std::max(c + filter_c, 0), static_cast<int>(numCols - 1));
+	int image_r = min(max(r + filter_r, 0), static_cast<int>(numRows - 1));
+	int image_c = min(max(c + filter_c, 0), static_cast<int>(numCols - 1));
 
 	float image_value = static_cast<float>(inputChannel[image_r * numCols + image_c]);
 	float filter_value = filter[(filter_r + filterWidth/2) * filterWidth + filter_c + filterWidth/2];
