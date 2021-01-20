@@ -102,9 +102,6 @@
 
 #include "utils.h"
 
-__device__ int mmin (int a, int b) {return (a<b) ? a : b;}
-__device__ int mmax (int a, int b) {return (a>b) ? a : b;}
-
 __global__
 void gaussian_blur(const unsigned char* const inputChannel,
                    unsigned char* const outputChannel,
@@ -156,7 +153,7 @@ void gaussian_blur(const unsigned char* const inputChannel,
       }
     }
 
-    outputChannel[r * numCols + c] = result;
+    outputChannel[r * numCols + c] = static_cast<char>(result);
   }
   
 }
