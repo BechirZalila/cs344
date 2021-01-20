@@ -52,8 +52,8 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
   //to an absolute 2D location in the image, then use that to
   //calculate a 1D offset
 
-  printf ("Grid  Size: %d %d %d\n", gridDim.x, gridDim.y, gridDim.z);
-  printf ("Block Size: %d %d %d\n", blockDim.x, blockDim.y, blockDim.z);
+  //printf ("Grid  Size: %d %d %d\n", gridDim.x, gridDim.y, gridDim.z);
+  //printf ("Block Size: %d %d %d\n", blockDim.x, blockDim.y, blockDim.z);
 
   /*
   for (size_t r = 0; r < numRows; ++r) {
@@ -67,7 +67,7 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
   int r = threadIdx.x + blockIdx.x * blockDim.x;
   int c = threadIdx.y + blockIdx.y * blockDim.y;
 
-  printf ("r = %d, c = %d\n", r, c);
+  //printf ("r = %d, c = %d\n", r, c);
 
   if ((r < numRows) && (c < numCols)) {
     uchar4 rgba = rgbaImage[r * numCols + c];
