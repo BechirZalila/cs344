@@ -64,8 +64,8 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
     }
   }
   */
-  int r = threadIdx.x + blockIdx.x * blockDim.x;
-  int c = threadIdx.y + blockIdx.y * blockDim.y;
+  int c = threadIdx.x + blockIdx.x * blockDim.x;
+  int r = threadIdx.y + blockIdx.y * blockDim.y;
 
   //printf ("r = %d, c = %d\n", r, c);
 
