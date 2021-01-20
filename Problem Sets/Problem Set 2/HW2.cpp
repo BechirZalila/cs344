@@ -91,7 +91,7 @@ void preProcess(uchar4 **h_inputImageRGBA, uchar4 **h_outputImageRGBA,
   for (int r = -blurKernelWidth/2; r <= blurKernelWidth/2; ++r) {
     for (int c = -blurKernelWidth/2; c <= blurKernelWidth/2; ++c) {
       (*h_filter)[(r + blurKernelWidth/2) * blurKernelWidth + c + blurKernelWidth/2] *= normalizationFactor;
-      printf ("%5.2f ", filterValue);
+      printf ("%5.2f ", (*h_filter)[(r + blurKernelWidth/2) * blurKernelWidth + c + blurKernelWidth/2]);
     }
   }
   printf ("\n");
