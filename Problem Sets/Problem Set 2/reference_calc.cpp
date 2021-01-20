@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cassert>
+#include <stdio.h>
 // for uchar4 struct
 #include <cuda_runtime.h>
 
