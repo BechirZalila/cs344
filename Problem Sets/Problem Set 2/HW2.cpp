@@ -81,10 +81,12 @@ void preProcess(uchar4 **h_inputImageRGBA, uchar4 **h_outputImageRGBA,
   for (int r = -blurKernelWidth/2; r <= blurKernelWidth/2; ++r) {
     for (int c = -blurKernelWidth/2; c <= blurKernelWidth/2; ++c) {
       float filterValue = expf( -(float)(c * c + r * r) / (2.f * blurKernelSigma * blurKernelSigma));
+      printf ("%5.2f ", filterValue);
       (*h_filter)[(r + blurKernelWidth/2) * blurKernelWidth + c + blurKernelWidth/2] = filterValue;
       filterSum += filterValue;
     }
   }
+  printf ("\n");
 
   float normalizationFactor = 1.f / filterSum;
 
