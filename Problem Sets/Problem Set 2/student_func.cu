@@ -263,7 +263,7 @@ void your_gaussian_blur
   const dim3 gridSize (gridWidth, gridHeight, 1);
 
   //TODO: Launch a kernel for separating the RGBA image into different color channels
-  separateChannels<<<gridSize, blockSize>>> (inputImageRGBA,
+  separateChannels<<<gridSize, blockSize>>> (d_inputImageRGBA,
 					     numRows, numCols,
 					     d_red, d_green, d_blue);
   
