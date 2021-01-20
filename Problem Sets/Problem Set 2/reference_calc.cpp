@@ -31,6 +31,9 @@ void channelConvolution(const unsigned char* const channel,
       }
 
       channelBlurred[r * numCols + c] = result;
+      if ((channelBlurred[r * numCols + c]) % 1000 == 0) {
+	printf ("RES2 %f\n", result);
+      }
     }
   }
 }
