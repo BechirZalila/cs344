@@ -189,10 +189,6 @@ void separateChannels(const uchar4* const inputImageRGBA,
     redChannel [i]   = rgba.x;
     greenChannel [i] = rgba.y;
     blueChannel [i]  = rgba.z;
-
-    if (i % 1000 == 0) {
-      printf ("%d %d %d\n", redChannel [i], greenChannel [i], blueChannel [i]);
-    }
   }
 }
 
@@ -225,6 +221,10 @@ void recombineChannels(const unsigned char* const redChannel,
   uchar4 outputPixel = make_uchar4(red, green, blue, 255);
 
   outputImageRGBA[thread_1D_pos] = outputPixel;
+
+  if (thread_1D_pos % 1000 == 0) {
+    printf ("%d %d %d\n", redChannel [thread_1D_pos], greenChannel [thread_1D_pos], blueChannel [thread_1D_pos]);
+  }
 }
 
 unsigned char *d_red, *d_green, *d_blue;
