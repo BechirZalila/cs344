@@ -281,6 +281,8 @@ void your_gaussian_blur
   const int gridWidth = numCols / blkWidth + 1;
   const int gridHeight = numRows / blkHeight + 1;
 
+  printf ("%d %d %d %d\n", blkWidth, blkHeight, gridWidth, gridHeight);
+
   //TODO: Set reasonable block size (i.e., number of threads per block)
   const dim3 blockSize (blkWidth, blkHeight, 1);
 
