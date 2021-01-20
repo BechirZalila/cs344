@@ -258,7 +258,7 @@ void allocateMemoryAndCopyToGPU(const size_t numRowsImage, const size_t numColsI
   //be able to tell if anything goes wrong
   //IMPORTANT: Notice that we pass a pointer to a pointer to cudaMalloc
 
-  checkCudaErrors (cudaMalloc (&d_filter, sizeof (float) * filterWidth));
+  checkCudaErrors (cudaMalloc (&d_filter, sizeof (float) * filterWidth * filterWidth));
 
   //TODO:
   //Copy the filter on the host (h_filter) to the memory you just allocated
