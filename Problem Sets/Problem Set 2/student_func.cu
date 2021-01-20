@@ -152,6 +152,18 @@ void separateChannels(const uchar4* const inputImageRGBA,
   // {
   //     return;
   // }
+
+  int c = threadIdx.x + blockIdx.x * blockDim.x;
+  int r = threadIdx.y + blockIdx.y * blockDim.y;
+
+  if ((r < numRows) && (c < numCols)) {
+    int i = r * numCols + c;
+    uchar4 rgba = inputImageRGBA [i];
+    redChannel [i]   = rgba.x;
+    greenChannel [i] = rgba.y;
+    blueChannel [i]  = rgba.z;
+
+  }
 }
 
 //This kernel takes in three color channels and recombines them
@@ -226,20 +238,30 @@ void allocateMemoryAndCopyToGPU(const size_t numRowsImage, const size_t numColsI
 
 }
 
-void your_gaussian_blur(const uchar4 * const h_inputImageRGBA, uchar4 * const d_inputImageRGBA,
-                        uchar4* const d_outputImageRGBA, const size_t numRows, const size_t numCols,
-                        unsigned char *d_redBlurred, 
-                        unsigned char *d_greenBlurred, 
-                        unsigned char *d_blueBlurred,
-                        const int filterWidth)
+void your_gaussian_blur
+  (const uchar4 * const h_inputImageRGBA,
+   uchar4 * const d_inputImageRGBA,
+   uchar4* const d_outputImageRGBA,
+   const size_t numRows,
+   const size_t numCols,
+   unsigned char *d_redBlurred, 
+   unsigned char *d_greenBlurred, 
+   unsigned char *d_blueBlurred,
+   const int filterWidth)
 {
+  const int blkWidth = 32; // 1024 threads max per block
+  const int blkHeight = 32; // 1024 threads max per block
+
+  const int gridWidth = numCols / blkWidth + 1;
+  const int gridHeight = numRows / blkHeight + 1;
+
   //TODO: Set reasonable block size (i.e., number of threads per block)
-  const dim3 blockSize;
+  const dim3 blockSize (blkWidth, blkHeight, 1);
 
   //TODO:
   //Compute correct grid size (i.e., number of blocks per kernel launch)
   //from the image size and and block size.
-  const dim3 gridSize;
+  const dim3 gridSize (gridWidth, gridHeight, 1);
 
   //TODO: Launch a kernel for separating the RGBA image into different color channels
 
