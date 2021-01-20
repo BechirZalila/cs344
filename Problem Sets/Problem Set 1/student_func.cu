@@ -52,10 +52,8 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
   //to an absolute 2D location in the image, then use that to
   //calculate a 1D offset
 
-  //printf ("Grid  Size: %d %d %d\n", gridDim.x, gridDim.y, gridDim.z);
-  //printf ("Block Size: %d %d %d\n", blockDim.x, blockDim.y, blockDim.z);
-
   /*
+  // Sequential version. To be used with only 1 thread
   for (size_t r = 0; r < numRows; ++r) {
     for (size_t c = 0; c < numCols; ++c) {
       uchar4 rgba = rgbaImage[r * numCols + c];
@@ -64,10 +62,9 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
     }
   }
   */
+  
   int c = threadIdx.x + blockIdx.x * blockDim.x;
   int r = threadIdx.y + blockIdx.y * blockDim.y;
-
-  //printf ("r = %d, c = %d\n", r, c);
 
   if ((r < numRows) && (c < numCols)) {
     uchar4 rgba = rgbaImage[r * numCols + c];
@@ -76,12 +73,11 @@ void rgba_to_greyscale(const uchar4* const rgbaImage,
   }
 }
 
-void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_rgbaImage,
-                            unsigned char* const d_greyImage, size_t numRows, size_t numCols)
+void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage,
+			    uchar4 * const d_rgbaImage,
+                            unsigned char* const d_greyImage,
+			    size_t numRows, size_t numCols)
 {
-
-  printf ("Rows: %d. Cols: %d\n", numRows, numCols);
-  
   //You must fill in the correct sizes for the blockSize and gridSize
   //currently only one block with one thread is being launched
 
@@ -93,8 +89,11 @@ void your_rgba_to_greyscale(const uchar4 * const h_rgbaImage, uchar4 * const d_r
   
   const dim3 blockSize(blkWidth, blkHeight, 1);  //TODO
   const dim3 gridSize(gridWidth, gridHeight, 1);  //TODO
-  rgba_to_greyscale<<<gridSize, blockSize>>>(d_rgbaImage, d_greyImage, numRows, numCols);
+  rgba_to_greyscale<<<gridSize, blockSize>>>(d_rgbaImage,
+					     d_greyImage,
+					     numRows,
+					     numCols);
   
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-
+  cudaDeviceSynchronize();
+  checkCudaErrors(cudaGetLastError());
 }
