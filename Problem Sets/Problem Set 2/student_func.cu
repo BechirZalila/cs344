@@ -194,9 +194,15 @@ void allocateMemoryAndCopyToGPU(const size_t numRowsImage, const size_t numColsI
 
   //allocate memory for the three different channels
   //original
-  checkCudaErrors(cudaMalloc(&d_red,   sizeof(unsigned char) * numRowsImage * numColsImage));
-  checkCudaErrors(cudaMalloc(&d_green, sizeof(unsigned char) * numRowsImage * numColsImage));
-  checkCudaErrors(cudaMalloc(&d_blue,  sizeof(unsigned char) * numRowsImage * numColsImage));
+  checkCudaErrors
+    (cudaMalloc(&d_red,
+		sizeof(unsigned char) * numRowsImage * numColsImage));
+  checkCudaErrors
+    (cudaMalloc(&d_green,
+		sizeof(unsigned char) * numRowsImage * numColsImage));
+  checkCudaErrors
+    (cudaMalloc(&d_blue,
+		sizeof(unsigned char) * numRowsImage * numColsImage));
 
   //TODO:
   //Allocate memory for the filter on the GPU
@@ -206,10 +212,17 @@ void allocateMemoryAndCopyToGPU(const size_t numRowsImage, const size_t numColsI
   //be able to tell if anything goes wrong
   //IMPORTANT: Notice that we pass a pointer to a pointer to cudaMalloc
 
+  checkCudaErrors (cudaMalloc (&d_filter, sizeof (float) * filterWidth));
+
   //TODO:
   //Copy the filter on the host (h_filter) to the memory you just allocated
   //on the GPU.  cudaMemcpy(dst, src, numBytes, cudaMemcpyHostToDevice);
   //Remember to use checkCudaErrors!
+  checkCudaErrors
+    (cudaMemcpy (d_filter,
+		 h_filter,
+		 sizeof (float) * filterWidth,
+		 cudaMemcpyHostToDevice));
 
 }
 
