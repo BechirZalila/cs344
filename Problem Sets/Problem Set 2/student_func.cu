@@ -154,7 +154,7 @@ void gaussian_blur(const unsigned char* const inputChannel,
     }
 
     outputChannel[r * numCols + c] = result;
-    if ((r * numCols + c) % 10000 == 0) {
+    if ((r * numCols + c) % 20000 == 0) {
       printf ("RES %f. VAL %d\n", result, inputChannel[r * numCols + c]);
       //printf ("%d %d\n", inputChannel[r * numCols + c] ,outputChannel[r * numCols + c]);
       //for (int k = 0; k < filterWidth; k++) {
