@@ -101,9 +101,12 @@ int main(int argc, char **argv) {
 
   postProcess(output_file, h_outputImageRGBA);
 
+  timer.Start();
   referenceCalculation(h_inputImageRGBA, h_outputImageRGBA,
                        numRows(), numCols(),
                        h_filter, filterWidth);
+  timer.Stop();
+  printf("Your seq code ran in: %f msecs.\n", timer.Elapsed());
 
   postProcess(reference_file, h_outputImageRGBA);
 
