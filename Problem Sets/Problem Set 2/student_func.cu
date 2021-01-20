@@ -261,13 +261,12 @@ void allocateMemoryAndCopyToGPU(const size_t numRowsImage, const size_t numColsI
 		 h_filter,
 		 sizeof (float) * filterWidth,
 		 cudaMemcpyHostToDevice));
-
 }
 
 void your_gaussian_blur
   (const uchar4 * const h_inputImageRGBA,
    uchar4 * const d_inputImageRGBA,
-   uchar4* const d_outputImageRGBA,
+   uchar4 * const d_outputImageRGBA,
    const size_t numRows,
    const size_t numCols,
    unsigned char *d_redBlurred, 
@@ -281,8 +280,8 @@ void your_gaussian_blur
   const int gridWidth = numCols / blkWidth + 1;
   const int gridHeight = numRows / blkHeight + 1;
 
-  printf ("%d %d %d %d\n", blkWidth, blkHeight, gridWidth, gridHeight);
-
+  print ("%d\n", filterWidth);
+  
   //TODO: Set reasonable block size (i.e., number of threads per block)
   const dim3 blockSize (blkWidth, blkHeight, 1);
 
