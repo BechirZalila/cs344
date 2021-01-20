@@ -267,7 +267,7 @@ void allocateMemoryAndCopyToGPU(const size_t numRowsImage, const size_t numColsI
   checkCudaErrors
     (cudaMemcpy (d_filter,
 		 h_filter,
-		 sizeof (float) * filterWidth,
+		 sizeof (float) * filterWidth * filterwidth,
 		 cudaMemcpyHostToDevice));
 }
 
