@@ -162,7 +162,6 @@ void separateChannels(const uchar4* const inputImageRGBA,
     redChannel [i]   = rgba.x;
     greenChannel [i] = rgba.y;
     blueChannel [i]  = rgba.z;
-
   }
 }
 
@@ -264,12 +263,24 @@ void your_gaussian_blur
   const dim3 gridSize (gridWidth, gridHeight, 1);
 
   //TODO: Launch a kernel for separating the RGBA image into different color channels
-
+  separateChannels<<<gridSize, blockSize>>> (inputImageRGBA,
+					     numRows, numCols,
+					     d_red, d_green, d_blue);
+  
   // Call cudaDeviceSynchronize(), then call checkCudaErrors() immediately after
   // launching your kernel to make sure that you didn't make any mistakes.
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   //TODO: Call your convolution kernel here 3 times, once for each color channel.
+  gaussian_blur<<<gridSize, blockSize>>> (d_red, d_redBlurred,
+					  numRows, numCols,
+					  d_filter, filterWidth);
+  gaussian_blur<<<gridSize, blockSize>>> (d_green, d_greenBlurred,
+					  numRows, numCols,
+					  d_filter, filterWidth);
+  gaussian_blur<<<gridSize, blockSize>>> (d_blue, d_blueBlurred,
+					  numRows, numCols,
+					  d_filter, filterWidth); 
 
   // Again, call cudaDeviceSynchronize(), then call checkCudaErrors() immediately after
   // launching your kernel to make sure that you didn't make any mistakes.
@@ -296,4 +307,5 @@ void cleanup() {
   checkCudaErrors(cudaFree(d_red));
   checkCudaErrors(cudaFree(d_green));
   checkCudaErrors(cudaFree(d_blue));
+  checkCudaErrors(cudaFree(d_filter));
 }
