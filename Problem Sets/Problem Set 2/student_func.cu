@@ -190,7 +190,7 @@ void separateChannels(const uchar4* const inputImageRGBA,
     greenChannel [i] = rgba.y;
     blueChannel [i]  = rgba.z;
 
-    if (i == 100) {
+    if (i % 1000 == 0) {
       printf ("%d %d %d\n", redChannel [i], greenChannel [i], blueChannel [i]);
     }
   }
