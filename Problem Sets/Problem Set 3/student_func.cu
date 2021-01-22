@@ -105,7 +105,7 @@ __global__ void shmem_min_reduce(float * d_out,
     {
         if (tid < s)
         {
-	  sdata[tid] = max (sdata[tid], sdata[tid + s]);
+	  sdata[tid] = min (sdata[tid], sdata[tid + s]);
         }
         __syncthreads();        // make sure all adds at one stage are done!
     }
