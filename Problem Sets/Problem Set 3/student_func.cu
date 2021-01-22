@@ -135,7 +135,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   //   store in min_logLum and max_logLum
 
   int threads = maxThreadsPerBlock;
-  int blocks = numPixels / maxThreadsPerBlock;
+  int blocks = (numPixels / maxThreadsPerBlock) + 1;
 
   float *d_intermediate, *d_out;
   checkCudaErrors(cudaMalloc(&d_intermediate, blocks * sizeof(float)));
