@@ -157,7 +157,7 @@ __global__ void shmem_max_reduce(float * d_out,
         }
 
 	if (myId == 0) {
-	  printf ("s = %lu\n", s);
+	  printf ("s = %d\n", s);
 	}
         __syncthreads();        // make sure all adds at one stage are done!
     }
