@@ -225,14 +225,14 @@ __global__ void naive_scan(unsigned int *g_odata, unsigned int *g_idata, int n)
     temp[pout*n+thid] = temp[pin*n+thid];
   __syncthreads();
 
-  offset = 2;
+  /*offset = 2;
   pout = 1 - pout; // swap double buffer indices
   pin = 1 - pin;
   if (thid >= offset)
     temp[pout*n+thid] += temp[pin*n+thid - offset];
   else
     temp[pout*n+thid] = temp[pin*n+thid];
-  __syncthreads();
+    __syncthreads();*/
   
 
   /*for (int offset = 1; offset < n; offset *= 2) {
@@ -329,13 +329,13 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   assert (numBins <= maxThreadsPerBlock);
 
-  //threads = numBins;
-  //blocks = 1;
-  //size_t shmem = 2 * numBins * sizeof (unsigned int);
+  threads = numBins;
+  blocks = 1;
+  size_t shmem = 2 * numBins * sizeof (unsigned int);
 
   
-  //naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
-  stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
+  naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
+  //stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
 
   const size_t S = numBins;
   unsigned int h_cdf[S];
