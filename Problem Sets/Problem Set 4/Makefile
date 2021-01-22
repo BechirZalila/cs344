@@ -1,5 +1,4 @@
-NVCC=/usr/local/cuda-5.0/bin/nvcc
-#NVCC=nvcc
+NVCC=nvcc
 
 ###################################
 # These are the default install   #
@@ -29,9 +28,8 @@ CUDA_INCLUDEPATH=/usr/local/cuda-10.1/include
 
 #CUDA_INCLUDEPATH=/usr/local/cuda/include
 #CUDA_LIBPATH=/usr/local/cuda/lib
-CUDA_LIBPATH=/usr/local/cuda-5.0/lib64
 
-NVCC_OPTS=-O3 -arch=sm_20 -Xcompiler -Wall -Xcompiler -Wextra -m64
+NVCC_OPTS=-O3 -arch=sm_75 -Xcompiler -Wall -Xcompiler -Wextra -m64
 
 GCC_OPTS=-O3 -Wall -Wextra -m64
 
