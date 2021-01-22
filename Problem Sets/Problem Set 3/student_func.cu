@@ -179,8 +179,7 @@ __global__ void simple_histo(int *d_bins,
 			     const size_t numBins)
 {
   int myId  = threadIdx.x + blockDim.x * blockIdx.x;
-  int tid   = threadIdx.x;
-  
+    
   // Make sure there is no overflow
   if (myId >= size){
     return;
