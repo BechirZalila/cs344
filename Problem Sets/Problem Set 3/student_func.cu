@@ -209,34 +209,13 @@ __global__ void naive_scan(unsigned int *g_odata, unsigned int *g_idata, int n)
   int thid = threadIdx.x;
   int pout = 0, pin = 1;
   
-  // Load input into shared memory.
-  // This is exclusive scan, so shift right by one
-  // and set first element to 0
+  // Load input into shared memory.  This is exclusive scan, so shift
+  // right by one and set first element to 0.  It is necessary to load
+  // the same array on the second half of the temp table because the
+  // addition we do is cumulative.
   temp[thid] = (thid > 0) ? g_idata[thid-1] : 0;
   temp[n + thid] = (thid > 0) ? g_idata[thid-1] : 0;
   __syncthreads();
-
-  /*  int offset = 1;
-  pout = 1 - pout; // swap double buffer indices
-  pin = 1 - pin;
-  if (thid >= offset)
-    temp[pout*n+thid] += temp[pin*n+thid - offset];
-  else
-    temp[pout*n+thid] = temp[pin*n+thid];
-  __syncthreads();
-
-  temp[pin*n+thid] = temp[pout*n+thid];
-  __syncthreads();
-
-  offset = 2;
-  pout = 1 - pout; // swap double buffer indices
-  pin = 1 - pin;
-  if (thid >= offset)
-    temp[pout*n+thid] += temp[pin*n+thid - offset];
-  else
-    temp[pout*n+thid] = temp[pin*n+thid];
-    __syncthreads();*/
-  
 
   for (int offset = 1; offset < n; offset *= 2) {
     pout = 1 - pout; // swap double buffer indices
@@ -247,6 +226,7 @@ __global__ void naive_scan(unsigned int *g_odata, unsigned int *g_idata, int n)
       temp[pout*n+thid] = temp[pin*n+thid];
     __syncthreads();
 
+    // Reload the other half of the array with the computed values
     temp[pin*n+thid] = temp[pout*n+thid];
     __syncthreads();
   }
@@ -342,35 +322,6 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   
   naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
   //stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
-
-  const size_t S = numBins;
-  unsigned int h_cdf[S];
-  unsigned int h_histo[S];
-
-  checkCudaErrors (cudaMemcpy (h_cdf,
-			       d_cdf,
-			       numBins * sizeof (unsigned int),
-			       cudaMemcpyDeviceToHost));
-  checkCudaErrors (cudaMemcpy (h_histo,
-			       d_histo,
-			       numBins * sizeof (unsigned int),
-			       cudaMemcpyDeviceToHost));
-
-  printf ("HISTO: ");
-  for (int k = 0; k < numBins; k++) {
-    printf ("%u ", h_histo [k]);
-    if ((k + 1) % 50 == 0)
-      printf ("\n");
-  }
-  printf ("\n");
-
-  printf ("CDF  : ");
-  for (int k = 0; k < numBins; k++) {
-    printf ("%u ", h_cdf [k]);
-    if ((k + 1) % 50 == 0)
-      printf ("\n");
-  }
-  printf ("\n");
 
   checkCudaErrors(cudaFree(d_intermediate));
   checkCudaErrors(cudaFree(d_out));
