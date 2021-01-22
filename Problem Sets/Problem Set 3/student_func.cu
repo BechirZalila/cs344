@@ -161,7 +161,6 @@ __global__ void shmem_max_reduce(float * d_out,
 	if (myId == 0) {
 	  printf ("s = %d. old s = %d\n", s, old_s);
 	}
-	s++;
 	old_s = s;
         __syncthreads();        // make sure all adds at one stage are done!
     }
