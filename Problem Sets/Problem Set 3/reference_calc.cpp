@@ -17,6 +17,7 @@ void referenceCalculation(const float* const h_logLuminance, unsigned int* const
 
   //Step 2
   float logLumRange = logLumMax - logLumMin;
+  printf ("%f\t%f\t%f\n", logLumMin, logLumMax, loLumRange);
 
   //Step 3
   //next we use the now known range to compute
