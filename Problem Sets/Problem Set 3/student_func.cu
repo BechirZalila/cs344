@@ -135,7 +135,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   //   store in min_logLum and max_logLum
 
   int threads = maxThreadsPerBlock;
-  int blocks = size / maxThreadsPerBlock;
+  int blocks = numPixels / maxThreadsPerBlock;
 
   float *d_intermediate, *d_out;
   checkCudaErrors(cudaMalloc(&d_intermediate, blocks * sizeof(float)));
@@ -148,7 +148,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   threads = blocks; // launch one thread for each block in prev step
   blocks = 1;
 
-  shmem_reduce_kernel<<<blocks, threads, threads * sizeof(float)>>>
+  shmem_min_reduce<<<blocks, threads, threads * sizeof(float)>>>
     (d_out, d_intermediate, threads);
   min_logLum = *d_out;
 
