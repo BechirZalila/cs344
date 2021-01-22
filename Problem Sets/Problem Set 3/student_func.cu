@@ -225,6 +225,9 @@ __global__ void naive_scan(unsigned int *g_odata, unsigned int *g_idata, int n)
     temp[pout*n+thid] = temp[pin*n+thid];
   __syncthreads();
 
+  temp[pin*n+thid] = temp[pout*n+thid];
+  __syncthreads();
+
   offset = 2;
   pout = 1 - pout; // swap double buffer indices
   pin = 1 - pin;
