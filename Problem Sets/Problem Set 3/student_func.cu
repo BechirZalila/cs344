@@ -285,7 +285,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   unsigned int *d_histo;
   
-  checkCudaErrors(cudaMalloc(&d_histo, numBins * sizeof(unisgned int)));
+  checkCudaErrors(cudaMalloc(&d_histo, numBins * sizeof(unsigned int)));
   checkCudaErrors(cudaMemset(d_histo, 0, sizeof(unsigned int) * numBins))
 
   threads = maxThreadsPerBlock;
