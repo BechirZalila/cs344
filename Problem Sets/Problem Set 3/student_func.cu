@@ -150,7 +150,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   shmem_min_reduce<<<blocks, threads, threads * sizeof(float)>>>
     (d_out, d_intermediate, threads);
-  //  min_logLum = *d_out;
+  checkCudaErrors (cudaMemcpy(&min_logLum, d_out, cudaMemcpyDeviceToHost));
 
   printf ("Min: %f\n", min_logLum);
 		  
