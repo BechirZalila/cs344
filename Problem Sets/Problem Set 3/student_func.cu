@@ -154,8 +154,10 @@ __global__ void shmem_max_reduce(float * d_out,
         if (tid < s)
         {
 	  sdata[tid] = max (sdata[tid], sdata[tid + s]);
-        } else if ((tid == s) && (old_s % 2 != 0)) {
-	  sdata [tid] = sdata [tid + s];
+        }
+
+	if ((tid == s - 1) && (old_s % 2 != 0)) {
+	  sdata [tid] = max (sdata[tid], sdata [tid + s + 1]);
 	}
 
 	if (myId == 0) {
