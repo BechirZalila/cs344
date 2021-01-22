@@ -250,14 +250,13 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   float range_logLum = max_logLum - min_logLum;
   
-  printf ("MinMaxRange: %f\t%f\t%f\n", min_logLum, max_logLum, range_logLum);
-
   //3) generate a histogram of all the values in the logLuminance channel using
   //   the formula: bin = (lum[i] - lumMin) / lumRange * numBins
 
   int *d_histo;
   
   checkCudaErrors(cudaMalloc(&d_histo, numBins * sizeof(int)));
+  printf ("Numbins = %d\n", numBins);
   
   //4) Perform an exclusive scan (prefix sum) on the histogram to get
   //   the cumulative distribution of luminance values (this should go in the
