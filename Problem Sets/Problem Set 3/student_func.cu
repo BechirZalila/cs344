@@ -217,7 +217,7 @@ __global__ void naive_scan(int *g_odata, int *g_idata, int n)
 	temp[pout*n+thid] = temp[pin*n+thid];
       __syncthreads();
     }
-  g_odata[thid] = temp[pout*n+thid1]; // write output
+  g_odata[thid] = temp[pout*n+thid]; // write output
 }
 
 void your_histogram_and_prefixsum(const float* const d_logLuminance,
@@ -301,7 +301,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   threads = numBins;
   blocks = 1;
-  size_t shmem = 2 * numBins * sizeOf (int);
+  size_t shmem = 2 * numBins * sizeof (int);
   
   naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
 
