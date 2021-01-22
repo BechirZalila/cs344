@@ -317,8 +317,8 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
   //stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
 
-  const size_t = numBins;
-  unsigned int h_cdf[numBins];
+  const size_t S = numBins;
+  unsigned int h_cdf[S];
 
   checkCudaErrors (cudaMemcpy (h_cdf,
 			       d_cdf,
