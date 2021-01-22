@@ -172,7 +172,7 @@ __global__ void shmem_max_reduce(float * d_out,
 }
 
 __global__ void simple_histo(int *d_bins,
-			     const int *d_logLuminance,
+			     const float *d_logLuminance,
 			     const float min_logLum,
 			     const float range_logLum,
 			     const size_t size,
