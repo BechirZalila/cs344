@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cassert>
-#include <stdio.h>
 
 void referenceCalculation(const float* const h_logLuminance, unsigned int* const h_cdf,
                           const size_t numRows, const size_t numCols, const size_t numBins, 
@@ -39,22 +38,6 @@ void referenceCalculation(const float* const h_logLuminance, unsigned int* const
   for (size_t i = 1; i < numBins; ++i) {
     h_cdf[i] = h_cdf[i - 1] + histo[i - 1];
   }
-
-  printf ("REF HISTO: ");
-  for (int k = 0; k < numBins; k++) {
-    printf ("%u ", histo [k]);
-    if ((k + 1) % 50 == 0)
-      printf ("\n");
-  }
-  printf ("\n");
-
-  printf ("REF CDF  : ");
-  for (int k = 0; k < numBins; k++) {
-    printf ("%u ", h_cdf [k]);
-    if ((k + 1) % 50 == 0)
-      printf ("\n");
-  }
-  printf ("\n");
 
   delete[] histo;
 }
