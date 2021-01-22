@@ -154,11 +154,14 @@ __global__ void shmem_max_reduce(float * d_out,
         if (tid < s)
         {
 	  sdata[tid] = max (sdata[tid], sdata[tid + s]);
-        }
+        } else if ((tid == s) && (old_s % 2 != 0)) {
+	  sdata [tid] = sdata [tid + s];
+	}
 
 	if (myId == 0) {
 	  printf ("s = %d. old s = %d\n", s, old_s);
 	}
+	s++;
 	old_s = s;
         __syncthreads();        // make sure all adds at one stage are done!
     }
