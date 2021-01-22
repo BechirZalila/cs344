@@ -149,7 +149,7 @@ __global__ void shmem_max_reduce(float * d_out,
     __syncthreads();            // make sure entire block is loaded!
 
     // do reduction in shared mem
-    for (unsigned int s = blockDim.x / 2, int old_s = blockDim.x; s > 0; old_s = s, s >>= 1)
+    for (unsigned int s = blockDim.x / 2, old_s = blockDim.x; s > 0; s >>= 1)
     {
         if (tid < s)
         {
@@ -157,8 +157,9 @@ __global__ void shmem_max_reduce(float * d_out,
         }
 
 	if (myId == 0) {
-	  printf ("s = %d\n", s);
+	  printf ("s = %d. old s = %d\n", s, old_s);
 	}
+	old_s = s;
         __syncthreads();        // make sure all adds at one stage are done!
     }
 
