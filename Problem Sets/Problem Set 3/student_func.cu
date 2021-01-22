@@ -213,7 +213,7 @@ __global__ void naive_scan(unsigned int *g_odata, unsigned int *g_idata, int n)
   // This is exclusive scan, so shift right by one
   // and set first element to 0
   temp[thid] = (thid > 0) ? g_idata[thid-1] : 0;
-  temp[n + thid] = 0;
+  temp[n + thid] = (thid > 0) ? g_idata[thid-1] : 0;
   __syncthreads();
 
   int offset = 1;
