@@ -312,9 +312,24 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   threads = numBins;
   blocks = 1;
   size_t shmem = 2 * numBins * sizeof (unsigned int);
+
   
   naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
   //stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
+
+  const size_t = numBins;
+  unsigned int h_cdf[numBins];
+
+  checkCudaErrors (cudaMemcpy (h_cdf,
+			       d_cdf,
+			       numBins * sizeof (unsigned int),
+			       cudaMemcpyDeviceToHost));
+  for (int k = 0; k < numBins; k++) {
+    printf ("%ud ", h_cdf [k]);
+    if (k % 50 == 0)
+      printf ("\n");
+  }
+  printf ("\n");
 
   checkCudaErrors(cudaFree(d_intermediate));
   checkCudaErrors(cudaFree(d_out));
