@@ -101,12 +101,21 @@ __global__ void shmem_min_reduce(float * d_out,
     __syncthreads();            // make sure entire block is loaded!
 
     // do reduction in shared mem
-    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1)
+    for (unsigned int s = blockDim.x / 2, old_s = blockDim.x; s > 0; s >>= 1)
     {
         if (tid < s)
         {
 	  sdata[tid] = min (sdata[tid], sdata[tid + s]);
         }
+
+	// If the previous chunk is of an odd size, the last element
+	// of the chunk would not be used. The statement below
+	// prevents that from happening.
+	if ((tid == s - 1) && (old_s % 2 != 0)) {
+	  sdata [tid] = max (sdata[tid], sdata [tid + s + 1]);
+	}
+
+	old_s = s;
         __syncthreads();        // make sure all adds at one stage are done!
     }
 
@@ -127,18 +136,6 @@ __global__ void shmem_max_reduce(float * d_out,
     int myId  = threadIdx.x + blockDim.x * blockIdx.x;
     int tid   = threadIdx.x;
 
-    if (myId == 0) {
-      float m = d_in [0];
-      int idx = 0;
-      for (int k = 0; k < size; k++) {
-	if (m < d_in [k]) {
-	  m = d_in[k];
-	  idx = k;
-	}
-      }
-      printf ("MMMMMMM %f at %d. size = %lu, BD = %lu\n", m, idx, size, blockDim.x);
-    }
-
     // Make sure there is no overflow
     if (myId >= size){
       return;
@@ -156,13 +153,13 @@ __global__ void shmem_max_reduce(float * d_out,
 	  sdata[tid] = max (sdata[tid], sdata[tid + s]);
         }
 
+	// If the previous chunk is of an odd size, the last element
+	// of the chunk would not be used. The statement below
+	// prevents that from happening.
 	if ((tid == s - 1) && (old_s % 2 != 0)) {
 	  sdata [tid] = max (sdata[tid], sdata [tid + s + 1]);
 	}
 
-	if (myId == 0) {
-	  printf ("s = %d. old s = %d\n", s, old_s);
-	}
 	old_s = s;
         __syncthreads();        // make sure all adds at one stage are done!
     }
