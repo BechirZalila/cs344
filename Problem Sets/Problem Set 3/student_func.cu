@@ -194,7 +194,7 @@ __global__ void stupid_scan (unsigned int *d_cdf, unsigned int *d_histo, int n)
 {
   d_cdf[0] = 0;
   for (size_t i = 1; i < n; ++i) {
-    d_cdf[i] = d_cdf[i - 1] + histo[i - 1];
+    d_cdf[i] = d_cdf[i - 1] + d_histo[i - 1];
   }
 }
 
