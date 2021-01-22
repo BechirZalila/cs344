@@ -117,6 +117,42 @@ __global__ void shmem_min_reduce(float * d_out,
     }
 }
 
+__global__ void shmem_max_reduce(float * d_out,
+				 const float * d_in,
+				 const size_t size)
+{
+    // sdata is allocated in the kernel call: 3rd arg to <<<b, t, shmem>>>
+    extern __shared__ float sdata[];
+
+    int myId  = threadIdx.x + blockDim.x * blockIdx.x;
+    int tid   = threadIdx.x;
+
+    // Make sure there is no overflow
+    if (myId >= size){
+      return;
+    }
+
+    // load shared mem from global mem
+    sdata[tid] = d_in[myId];
+    __syncthreads();            // make sure entire block is loaded!
+
+    // do reduction in shared mem
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1)
+    {
+        if (tid < s)
+        {
+	  sdata[tid] = max (sdata[tid], sdata[tid + s]);
+        }
+        __syncthreads();        // make sure all adds at one stage are done!
+    }
+
+    // only thread 0 writes result for this block back to global mem
+    if (tid == 0)
+    {
+        d_out[blockIdx.x] = sdata[0];
+    }
+}
+
 void your_histogram_and_prefixsum(const float* const d_logLuminance,
                                   unsigned int* const d_cdf,
                                   float &min_logLum,
@@ -141,6 +177,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   checkCudaErrors(cudaMalloc(&d_intermediate, blocks * sizeof(float)));
   checkCudaErrors(cudaMalloc(&d_out, sizeof(float)));;
 
+  // Min reduce
   shmem_min_reduce<<<blocks, threads, threads * sizeof(float)>>>
     (d_intermediate, d_logLuminance, numPixels);
 
@@ -155,7 +192,22 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 			      sizeof (float),
 			      cudaMemcpyDeviceToHost));
 
-  printf ("Min: %f\n", min_logLum);
+  // Max reduce
+  shmem_max_reduce<<<blocks, threads, threads * sizeof(float)>>>
+    (d_intermediate, d_logLuminance, numPixels);
+
+  // Now we're down to one block left, so reduce it
+  threads = blocks; // launch one thread for each block in prev step
+  blocks = 1;
+
+  shmem_max_reduce<<<blocks, threads, threads * sizeof(float)>>>
+    (d_out, d_intermediate, threads);
+  checkCudaErrors (cudaMemcpy(&max_logLum,
+			      d_out,
+			      sizeof (float),
+			      cudaMemcpyDeviceToHost));
+  
+  printf ("MinMax: %f\t%f\n", min_logLum, max_logLum);
 		  
   
   //2) subtract them to find the range
