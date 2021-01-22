@@ -171,6 +171,26 @@ __global__ void shmem_max_reduce(float * d_out,
     }
 }
 
+__global__ void simple_histo(int *d_bins,
+			     const int *d_logLuminance,
+			     const float min_logLum,
+			     const float range_logLum,
+			     const size_t size,
+			     const size_t numBins)
+{
+  int myId  = threadIdx.x + blockDim.x * blockIdx.x;
+  int tid   = threadIdx.x;
+  
+  // Make sure there is no overflow
+  if (myId >= size){
+    return;
+  }
+
+  float myItem = d_logLuminance [myId];
+  int myBin = (myItem - min_logLum) / range_logLum * numBins;
+  atomicAdd(&(d_bins[myBin]), 1);
+}
+
 void your_histogram_and_prefixsum(const float* const d_logLuminance,
                                   unsigned int* const d_cdf,
                                   float &min_logLum,
@@ -235,11 +255,18 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   //3) generate a histogram of all the values in the logLuminance channel using
   //   the formula: bin = (lum[i] - lumMin) / lumRange * numBins
+
+  int *d_histo;
+  
+  checkCudaErrors(cudaMalloc(&d_histo, numBins * sizeof(int)));
+  
   //4) Perform an exclusive scan (prefix sum) on the histogram to get
   //   the cumulative distribution of luminance values (this should go in the
   //   incoming d_cdf pointer which already has been allocated for you)
 
   checkCudaErrors(cudaFree(d_intermediate));
   checkCudaErrors(cudaFree(d_out));
+  checkCudaErrors(cudaFree(d_histo));
+  
 
 }
