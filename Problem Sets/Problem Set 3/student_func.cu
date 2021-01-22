@@ -319,14 +319,29 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   const size_t S = numBins;
   unsigned int h_cdf[S];
+  unsigned int h_histo[S];
 
   checkCudaErrors (cudaMemcpy (h_cdf,
 			       d_cdf,
 			       numBins * sizeof (unsigned int),
 			       cudaMemcpyDeviceToHost));
+  checkCudaErrors (cudaMemcpy (h_histo,
+			       d_histo,
+			       numBins * sizeof (unsigned int),
+			       cudaMemcpyDeviceToHost));
+
+  printf ("HISTO: ");
+  for (int k = 0; k < numBins; k++) {
+    printf ("%u ", h_histo [k]);
+    if ((k + 1) % 50 == 0)
+      printf ("\n");
+  }
+  printf ("\n");
+
+  printf ("CDF  : ");
   for (int k = 0; k < numBins; k++) {
     printf ("%u ", h_cdf [k]);
-    if (k % 50 == 0)
+    if ((k + 1) % 50 == 0)
       printf ("\n");
   }
   printf ("\n");
