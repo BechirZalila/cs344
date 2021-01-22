@@ -4,13 +4,13 @@
 # <author>  Quan Tran Minh. edit by Johannes Kast, Michael Sarahan </author>
 # <email>   quantm@unist.ac.kr  kast.jo@googlemail.com msarahan@gmail.com</email>
 ############################################################################
-# minimum required cmake version
 cmake_minimum_required(VERSION 2.8)
+
 find_package(CUDA QUIET REQUIRED)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-SET (compare_files compare.cpp)
+# collect source files
 
 file( GLOB  hdr *.hpp *.h )
 file( GLOB  cu  *.cu)
