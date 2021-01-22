@@ -209,10 +209,12 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 			      sizeof (float),
 			      cudaMemcpyDeviceToHost));
   
-  printf ("MinMax: %f\t%f\n", min_logLum, max_logLum);
-		  
-  
   //2) subtract them to find the range
+
+  float range_logLum = max_logLum - min_logLum;
+  
+  printf ("MinMaxRange: %f\t%f\t%f\n", min_logLum, max_logLum, range_logLum);
+
   //3) generate a histogram of all the values in the logLuminance channel using
   //   the formula: bin = (lum[i] - lumMin) / lumRange * numBins
   //4) Perform an exclusive scan (prefix sum) on the histogram to get
