@@ -190,6 +190,36 @@ __global__ void simple_histo(int *d_bins,
   atomicAdd(&(d_bins[myBin]), 1);
 }
 
+__global__ void naive_scan(int *g_odata, int *g_idata, int n)
+{
+  // Hillis and Steel algo. This is an inclusive scan. To get an
+  // exclusive scan, we shift all the elements to the right first.
+  
+  // From: https://developer.nvidia.com/gpugems/gpugems3/part-vi-gpu-computing/chapter-39-parallel-prefix-sum-scan-cuda
+  
+  extern __shared__ float temp[]; // allocated on invocation
+  int thid = threadIdx.x;
+  int pout = 0, pin = 1;
+
+  // Load input into shared memory.
+  // This is exclusive scan, so shift right by one
+  // and set first element to 0. 
+  temp[thid] = (thid > 0) ? g_idata[thid-1] : 0;
+  __syncthreads();
+  
+  for (int offset = 1; offset < n; offset *= 2)
+    {
+      pout = 1 - pout; // swap double buffer indices
+      pin = 1 - pout;
+      if (thid >= offset)
+	temp[pout*n+thid] += temp[pin*n+thid - offset];
+      else
+	temp[pout*n+thid] = temp[pin*n+thid];
+      __syncthreads();
+    }
+  g_odata[thid] = temp[pout*n+thid1]; // write output
+}
+
 void your_histogram_and_prefixsum(const float* const d_logLuminance,
                                   unsigned int* const d_cdf,
                                   float &min_logLum,
@@ -266,6 +296,14 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   //4) Perform an exclusive scan (prefix sum) on the histogram to get
   //   the cumulative distribution of luminance values (this should go in the
   //   incoming d_cdf pointer which already has been allocated for you)
+
+  assert (numBins <= maxThreadsPerBlock);
+
+  threads = numBins;
+  blocks = 1;
+  size_t shmem = 2 * numBins * sizeOf (int);
+  
+  naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
 
   checkCudaErrors(cudaFree(d_intermediate));
   checkCudaErrors(cudaFree(d_out));
