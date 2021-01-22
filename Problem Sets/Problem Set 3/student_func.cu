@@ -256,8 +256,13 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   int *d_histo;
   
   checkCudaErrors(cudaMalloc(&d_histo, numBins * sizeof(int)));
-  printf ("Numbins = %ld\n", numBins);
-  
+
+  threads = maxThreadsPerBlock;
+  blocks = (numPixels / maxThreadsPerBlock) + 1;
+
+  simple_histo<<<blocks, threads, threads * sizeof(float)>>>
+    (d_histo, d_logLuminance, min_logLum, range_logLum,  numPixels, numBins);
+    
   //4) Perform an exclusive scan (prefix sum) on the histogram to get
   //   the cumulative distribution of luminance values (this should go in the
   //   incoming d_cdf pointer which already has been allocated for you)
