@@ -6,8 +6,8 @@ NVCC=/usr/local/cuda-5.0/bin/nvcc
 # locations on most linux distros #
 ###################################
 
-OPENCV_LIBPATH=/usr/lib
-OPENCV_INCLUDEPATH=/usr/include
+OPENCV_LIBPATH=${shell pkg-config --libs opencv}
+OPENCV_INCLUDEPATH=${shell pkg-config --cflags opencv}
 
 ###################################################
 # On Macs the default install locations are below #
