@@ -128,11 +128,15 @@ __global__ void shmem_max_reduce(float * d_out,
     int tid   = threadIdx.x;
 
     if (myId == 0) {
-      float m = d_in [myId];
+      float m = d_in [0];
+      int idx = 0;
       for (int k = 0; k < size; k++) {
-	m = max (m, d_in[k]);
+	if (m < d_in [k]) {
+	  m = d_in[k];
+	  idx = k;
+	}
       }
-      printf ("MMMMMMM %f\n", m);
+      printf ("MMMMMMM %f at %d\n", m, idx);
     }
 
     // Make sure there is no overflow
