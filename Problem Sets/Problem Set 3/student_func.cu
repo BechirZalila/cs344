@@ -170,13 +170,14 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   //1) find the minimum and maximum value in the input logLuminance channel
   //   store in min_logLum and max_logLum
 
+  int threads = maxThreadsPerBlock;
+  int blocks = (numPixels / maxThreadsPerBlock) + 1;
+
   float *d_intermediate, *d_out;
   checkCudaErrors(cudaMalloc(&d_intermediate, blocks * sizeof(float)));
   checkCudaErrors(cudaMalloc(&d_out, sizeof(float)));;
 
   // Min reduce
-  int threads = maxThreadsPerBlock;
-  int blocks = (numPixels / maxThreadsPerBlock) + 1;
   shmem_min_reduce<<<blocks, threads, threads * sizeof(float)>>>
     (d_intermediate, d_logLuminance, numPixels);
 
