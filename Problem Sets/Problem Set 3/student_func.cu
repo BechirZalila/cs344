@@ -326,6 +326,4 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   checkCudaErrors(cudaFree(d_intermediate));
   checkCudaErrors(cudaFree(d_out));
   checkCudaErrors(cudaFree(d_histo));
-  
-
 }
