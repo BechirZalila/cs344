@@ -190,14 +190,6 @@ __global__ void simple_histo(unsigned int *d_bins,
   atomicAdd(&(d_bins[myBin]), 1);
 }
 
-__global__ void stupid_scan (unsigned int *d_cdf, unsigned int *d_histo, int n)
-{
-  d_cdf[0] = 0;
-  for (size_t i = 1; i < n; ++i) {
-    d_cdf[i] = d_cdf[i - 1] + d_histo[i - 1];
-  }
-}
-
 __global__ void naive_scan(unsigned int *g_odata, unsigned int *g_idata, int n)
 {
   // Hillis and Steel algo. This is an inclusive scan. To get an
@@ -321,7 +313,6 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   
   naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
-  //stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
 
   checkCudaErrors(cudaFree(d_intermediate));
   checkCudaErrors(cudaFree(d_out));
