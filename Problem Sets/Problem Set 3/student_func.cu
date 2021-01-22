@@ -136,7 +136,7 @@ __global__ void shmem_max_reduce(float * d_out,
 	  idx = k;
 	}
       }
-      printf ("MMMMMMM %f at %d. size = %lu\n", m, idx, size);
+      printf ("MMMMMMM %f at %d. size = %lu, BD = %lu\n", m, idx, size, blockDim.x);
     }
 
     // Make sure there is no overflow
