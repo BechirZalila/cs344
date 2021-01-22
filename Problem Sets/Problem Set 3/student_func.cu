@@ -309,13 +309,13 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   assert (numBins <= maxThreadsPerBlock);
 
-  //threads = numBins;
-  //blocks = 1;
-  //size_t shmem = 2 * numBins * sizeof (unsigned int);
+  threads = numBins;
+  blocks = 1;
+  size_t shmem = 2 * numBins * sizeof (unsigned int);
 
   
-  //naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
-  stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
+  naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
+  //stupid_scan<<<1,1>>> (d_cdf, d_histo, numBins);
 
   const size_t S = numBins;
   unsigned int h_cdf[S];
