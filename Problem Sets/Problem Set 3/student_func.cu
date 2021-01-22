@@ -171,7 +171,7 @@ __global__ void shmem_max_reduce(float * d_out,
     }
 }
 
-__global__ void simple_histo(int *d_bins,
+__global__ void simple_histo(unsigned int *d_bins,
 			     const float *d_logLuminance,
 			     const float min_logLum,
 			     const float range_logLum,
@@ -190,7 +190,7 @@ __global__ void simple_histo(int *d_bins,
   atomicAdd(&(d_bins[myBin]), 1);
 }
 
-__global__ void naive_scan(int *g_odata, int *g_idata, int n)
+__global__ void naive_scan(unsigned int *g_odata, unsigned int *g_idata, int n)
 {
   // Hillis and Steel algo. This is an inclusive scan. To get an
   // exclusive scan, we shift all the elements to the right first.
@@ -283,7 +283,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
   //3) generate a histogram of all the values in the logLuminance channel using
   //   the formula: bin = (lum[i] - lumMin) / lumRange * numBins
 
-  int *d_histo;
+  unsigned int *d_histo;
   
   checkCudaErrors(cudaMalloc(&d_histo, numBins * sizeof(int)));
 
@@ -301,7 +301,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
 
   threads = numBins;
   blocks = 1;
-  size_t shmem = 2 * numBins * sizeof (int);
+  size_t shmem = 2 * numBins * sizeof (unsigned int);
   
   naive_scan<<<blocks, threads, shmem>>> (d_cdf, d_histo, numBins);
 
