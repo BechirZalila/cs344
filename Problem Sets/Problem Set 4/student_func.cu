@@ -137,5 +137,63 @@ void your_sort(unsigned int* const d_inputVals,
                unsigned int* const d_outputPos,
                const size_t numElems)
 { 
+  // How many bits/time to compare at each iteration
+  const int numBits = 1;
+  const int numBins = 1 << numBits; // 1 bit => 2 bins
   
+  const int m = 1 << 10;// 1024
+  int blocks = ceil((float)numElems / m);
+  
+  printf("m %d blocks %d\n", m ,blocks);
+
+  // allocate GPU memory
+  unsigned int *d_binHistogram;
+  checkCudaErrors(cudaMalloc(&d_binHistogram, sizeof(unsigned int)* numBins));
+
+  // not numBins --> different from CPU version
+  thrust::device_vector<unsigned int> d_scan(numElems);
+
+  // Loop bits: only guaranteed to work for numBits that are multiples of 2
+  for (unsigned int i = 0; i < 8 * sizeof(unsigned int); i++) {
+    // 0) Zero out the histogram for this itération
+
+    checkCudaErrors(cudaMemset(d_binHistogram, 0, sizeof(unsigned int)* numBins));
+
+    // 1) perform histogram of data & mask into bins
+
+    histo_kernel <<<blocks, m >>>(d_binHistogram, d_inputVals, i, numElems);
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+    // 2) perform exclusive prefix sum (scan) on binHistogram to get
+    //    starting location for each bin
+
+    sumscan_kernel <<<1, numBins, sizeof(unsigned int)* numBins>>>(d_binHistogram, numBins, numElems);
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+    // 3) Gather everything into the correct location need to move
+    //    vals and positions
+
+    makescan_kernel <<<blocks, m >>>(d_inputVals, thrust::raw_pointer_cast(&d_scan[0]), i, numElems);
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+    // segmented scan described in http://http.developer.nvidia.com/GPUGems3/gpugems3_ch39.html
+    thrust::exclusive_scan(d_scan.begin(), d_scan.end(), d_scan.begin());
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+    move_kernel << <blocks, m >> >(d_inputVals, d_inputPos, d_outputVals, d_outputPos,
+      numElems, d_binHistogram, thrust::raw_pointer_cast(&d_scan[0]), i);
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+    checkCudaErrors(cudaMemcpy(d_inputVals,
+			       d_outputVals,
+			       numElems * sizeof(unsigned int),
+			       cudaMemcpyDeviceToDevice));
+    checkCudaErrors(cudaMemcpy(d_inputPos,
+			       d_outputPos,
+			       numElems * sizeof(unsigned int),
+			       cudaMemcpyDeviceToDevice));
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  }
+  // Free memory
+  checkCudaErrors(cudaFree(d_binHistogram));
 }
