@@ -112,10 +112,11 @@ int main(int argc, char **argv) {
   thrust::host_vector<unsigned int> h_outputPos(numElems);
 
   reference_calculation(&h_inputVals[0], &h_inputPos[0],
-						&h_outputVals[0], &h_outputPos[0],
-						numElems);
+			&h_outputVals[0], &h_outputPos[0],
+			numElems);
 
-  postProcess(valsPtr, posPtr, numElems, reference_file);
+  //postProcess(valsPtr, posPtr, numElems, reference_file);
+    postProcess(&h_outputVals[0], &h_outputPos[0], numElems, reference_file);
 
   compareImages(reference_file, output_file, useEpsCheck, perPixelError, globalError);
 
