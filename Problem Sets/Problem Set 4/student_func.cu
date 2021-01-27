@@ -178,7 +178,7 @@ void your_sort(unsigned int* const d_inputVals,
     makescan_kernel <<<blocks, m >>>(d_inputVals, thrust::raw_pointer_cast(&d_scan[0]), i, numElems);
     cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-    // segmented scan described in http://http.developer.nvidia.com/GPUGems3/gpugems3_ch39.html
+    // segmented scan 
     thrust::exclusive_scan(d_scan.begin(), d_scan.end(), d_scan.begin());
     cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
