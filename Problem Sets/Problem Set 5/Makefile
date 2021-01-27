@@ -7,11 +7,14 @@ OPENCV_INCLUDEPATH=${shell pkg-config --cflags opencv}
 
 CUDA_INCLUDEPATH=/usr/local/cuda-10.1/include
 
-histo: main.cu reference_calc.o student.o Makefile
-	nvcc -o HW5 main.cu reference_calc.o student.o $(NVCC_OPTS)
+HW5: main.o reference_calc.o student.o Makefile
+	nvcc -o HW5 main.o reference_calc.o student.o $(NVCC_OPTS)
 
 student.o: student.cu
 	nvcc -c student.cu $(NVCC_OPTS)
+
+main.o: main.cu
+	nvcc -c main.cu $(NVCC_OPTS)
 
 reference_calc.o: reference_calc.cpp reference_calc.h
 	g++ -c reference_calc.cpp -I $(OPENCV_INCLUDEPATH) $(GCC_OPTS) -I $(CUDA_INCLUDEPATH)
