@@ -65,7 +65,7 @@ void printVector(const char * const msg,
   std::cout << std::endl;
 }
 
-void denseHisto (const unsigned int* const d_vals, //INPUT
+void denseHisto (unsigned int* const d_vals, //INPUT
 		 unsigned int* const d_histo,      //OUTPUT
 		 const unsigned int numBins,
 		 const unsigned int numElems)
@@ -92,23 +92,28 @@ void denseHisto (const unsigned int* const d_vals, //INPUT
   //	       thrust::device_pointer_cast(d_histo) + numBins);
 }
 
-void sparseHisto (const unsigned int* const d_vals, //INPUT
+void sparseHisto (unsigned int* const d_vals, //INPUT
 		  unsigned int* const d_histo,      //OUTPUT
 		  const unsigned int numBins,
 		  const unsigned int numElems)
 {
   thrust::device_ptr<unsigned int> vals =
     thrust::device_pointer_cast ((unsigned int *)d_vals);
-  thrust::device_vector<unsigned int> sorted_data (numElems);
-  thrust::copy (vals, vals + numElems, sorted_data.begin());
-  thrust::sort (sorted_data.begin(), sorted_data.end());
+  //thrust::device_vector<unsigned int> sorted_data (numElems);
+  //thrust::copy (vals, vals + numElems, sorted_data.begin());
+  //thrust::sort (sorted_data.begin(), sorted_data.end());
+  thrust::sort (vals, vals + numElems);
   
   thrust::device_vector<unsigned int> histo_vals (numBins);
   thrust::device_vector<unsigned int> histo_counts (numBins);
 
-  thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
+  //thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
+  //			 thrust::constant_iterator<unsigned int>(1),
+  //			 histo_vals.begin(), histo_counts.begin());
+  thrust::reduce_by_key (vals, vals + numElems,
 			 thrust::constant_iterator<unsigned int>(1),
 			 histo_vals.begin(), histo_counts.begin());
+  
 
   thrust::scatter (histo_counts.begin(), histo_counts.end(), histo_vals.begin(),
 		   thrust::device_pointer_cast(d_histo));
@@ -126,7 +131,7 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
   //printVector ("Histo Counts : ", histo_counts.begin(), histo_counts.end());
 }
 
-void computeHistogram(const unsigned int* const d_vals, //INPUT
+void computeHistogram(unsigned int* const d_vals, //INPUT
                       unsigned int* const d_histo,      //OUTPUT
                       const unsigned int numBins,
                       const unsigned int numElems,
