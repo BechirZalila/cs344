@@ -91,8 +91,8 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
   thrust::device_vector<unsigned int> histo_counts (numBins);
 
   thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
-			 thrust::constant_iterator<unsigned_int>(1),
-			 histo_values.begin(), histo_count.begin());
+			 thrust::constant_iterator<unsigned int>(1),
+			 histo_vals.begin(), histo_counts.begin());
 
   thrust::copy (histo_count.begin(), histo_count.end(),
 		thrust::device_pointer_cast(d_histo)); 
