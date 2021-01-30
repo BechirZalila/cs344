@@ -83,7 +83,7 @@ void denseHisto (unsigned int* const d_vals, //INPUT
   thrust::device_ptr<unsigned int> histo (d_histo);
   thrust::counting_iterator<unsigned int> search_begin (0);
 
-  Gputimer t1;
+  GpuTimer t1;
   t1.Start();
   //  thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
   //		       search_begin, search_begin + numBins,
@@ -122,7 +122,7 @@ void sparseHisto (unsigned int* const d_vals,       //INPUT
   //thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
   //			 thrust::constant_iterator<unsigned int>(1),
   //			 histo_vals.begin(), histo_counts.begin());
-  Gputimer t2;
+  GpuTimer t2;
   t2.Start();
   thrust::reduce_by_key (vals, vals + numElems,
 			 thrust::constant_iterator<unsigned int>(1),
@@ -167,7 +167,7 @@ void computeHistogram(unsigned int* const d_vals, //INPUT
     {
     case 0:
       // Launch the simple naive histo
-      Gputimer t3;
+      GpuTimer t3;
       t3.Start();
       yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
       cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
