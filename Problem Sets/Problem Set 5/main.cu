@@ -25,7 +25,7 @@
 
 #include "reference_calc.h"
 
-void computeHistogram(unsigned int *const d_vals,
+void computeHistogram(const unsigned int *const d_vals,
                       unsigned int* const d_histo,
                       const unsigned int numBins,
                       const unsigned int numElems);

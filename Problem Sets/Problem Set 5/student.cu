@@ -32,7 +32,6 @@
 #include <thrust/iterator/counting_iterator.h>
 
 #include "utils.h"
-#include "timer.h"
 
 // Very Simple Histo
 __global__
@@ -70,24 +69,13 @@ void denseHisto (thrust::device_ptr<unsigned int> &d_vals,
 		 thrust::device_ptr<unsigned int> &d_histo,
 		 const unsigned int numBins,
 		 const unsigned int numElems)
-//void denseHisto (unsigned int* const d_vals,  //INPUT
-//		 unsigned int* const d_histo, //OUTPUT
-//		 const unsigned int numBins,
-//		 const unsigned int numElems)
 {
-  //  thrust::device_ptr<unsigned int> vals (d_vals);
-  //  thrust::device_ptr<unsigned int> histo (d_histo);
-  
-  GpuTimer t1;
-  t1.Start();
   thrust::counting_iterator<unsigned int> search_begin (0);
   thrust::sort (d_vals, d_vals + numElems);
   thrust::upper_bound (d_vals, d_vals + numElems,
 		       search_begin, search_begin + numBins,
 		       d_histo);
   thrust::adjacent_difference (d_histo, d_histo + numBins, d_histo);
-  t1.Stop();
-  printf("Dense Histo ran in: %f msecs.\n", t1.Elapsed());
 
   //  printVector ("Dense  Histo : ",
   //	       thrust::device_pointer_cast(d_histo),
@@ -100,17 +88,7 @@ void sparseHisto (thrust::device_ptr<unsigned int> &d_vals,
 		  thrust::device_vector<unsigned int> &d_histo_counts,
 		  const unsigned int numBins,
 		  const unsigned int numElems)
-//void sparseHisto (unsigned int* const d_vals,       //INPUT
-//		  unsigned int* const d_histo,      //OUTPUT
-//		  const unsigned int numBins,
-//		  const unsigned int numElems)
 {
-  //  thrust::device_ptr<unsigned int> vals (d_vals);
-  //  thrust::device_vector<unsigned int> histo_vals (numBins);
-  //  thrust::device_vector<unsigned int> histo_counts (numBins);
-
-  GpuTimer t2;
-  t2.Start();
   thrust::sort (d_vals, d_vals + numElems);
   thrust::reduce_by_key (d_vals, d_vals + numElems,
 			 thrust::constant_iterator<unsigned int>(1),
@@ -127,16 +105,14 @@ void sparseHisto (thrust::device_ptr<unsigned int> &d_vals,
   thrust::copy (d_histo_counts.begin(),
 		d_histo_counts.begin()+1,
 		thrust::device_pointer_cast(d_histo));
-  t2.Stop();
-  printf("Sparse Histo ran in: %f msecs.\n", t2.Elapsed());
 
   //printVector ("Sparse Histo : ", thrust::device_pointer_cast(d_histo),
   //	       thrust::device_pointer_cast(d_histo) + numBins);
-  //  printVector ("Histo Vals   : ", histo_vals.begin(), histo_vals.end());
-  //printVector ("Histo Counts : ", histo_counts.begin(), histo_counts.end());
+  //printVector ("Histo Vals   : ", d_histo_vals.begin(), d_histo_vals.end());
+  //printVector ("Histo Counts : ", d_histo_counts.begin(), d_histo_counts.end());
 }
 
-void computeHistogram(unsigned int* const d_vals, //INPUT
+void computeHistogram(const unsigned int* const d_vals, //INPUT
                       unsigned int* const d_histo,      //OUTPUT
                       const unsigned int numBins,
                       const unsigned int numElems)
@@ -150,10 +126,7 @@ void computeHistogram(unsigned int* const d_vals, //INPUT
 
   int threads = maxThreadsPerBlock;
   int blocks = (numElems / maxThreadsPerBlock) + 1;
-  GpuTimer t3;
-  t3.Start();
+
   yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  t3.Stop();
-  printf("Cuda Histo ran in: %f msecs.\n", t3.Elapsed());
 }
