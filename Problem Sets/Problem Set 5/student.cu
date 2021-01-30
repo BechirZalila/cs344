@@ -70,14 +70,14 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
   int threads = maxThreadsPerBlock;
   int blocks = (numElems / maxThreadsPerBlock) + 1;
 
-  switch (method)
-    {
-    case 0:
+  //switch (method)
+  //  {
+  //  case 0:
       // Launch the simple naive histo
-      yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
-      cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-      break;
-    case 1:
+  //    yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
+  //    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //    break;
+  //  case 1:
       // Dense Histogram using binary search
       thrust::device_ptr<unsigned int> vals =
 	thrust::device_pointer_cast ((unsigned int *)d_vals);
@@ -97,12 +97,12 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
       thrust::copy (histo.begin(), histo.end(),
 		    thrust::device_pointer_cast(d_histo));
       
-      break;
-    case 2:
-      break;
-    default:
-      std::cerr << "   Invalid method: " << method << "." << std::endl;
-      exit (1);
-      break;
-    }
+      //    break;
+      //case 2:
+      //break;
+      //default:
+      //std::cerr << "   Invalid method: " << method << "." << std::endl;
+      //exit (1);
+      //break;
+      //}
 }
