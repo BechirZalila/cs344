@@ -20,6 +20,5 @@ SET (HW5_files reference_calc.cpp)
 CUDA_ADD_EXECUTABLE(HW5 ${HW5_files} ${hdr} ${cu})
 target_link_libraries(HW5 ${OpenCV_LIBS})
 
-
-
+CUDA_ADD_EXECUTABLE(sample_hist histogram.cu)
 
