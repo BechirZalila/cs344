@@ -27,6 +27,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/sort.h>
 #include <thrust/copy.h>
+#include <thrust/binary_search.h>
 #include <thrust/adjacent_difference.h>
 #include <thrust/iterator/counting_iterator.h>
 
@@ -80,7 +81,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
       // Dense Histogram using binary search
       thrust::device_ptr<unsigned int> vals =
 	thrust::device_pointer_cast (d_vals);
-      thrust::device_vector<unsigned int> sorted_data (NumElems);
+      thrust::device_vector<unsigned int> sorted_data (numElems);
       thrust::copy (vals, vals + numElems, sorted_data.begin());
       
       thrust::device_vector<unsigned int> histo (numBins);
