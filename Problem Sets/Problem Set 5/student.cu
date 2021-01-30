@@ -83,11 +83,9 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
 	thrust::device_pointer_cast ((unsigned int *)d_vals);
       thrust::device_vector<unsigned int> sorted_data (numElems);
       thrust::copy (vals, vals + numElems, sorted_data.begin());
+      thrust::sort (sorted_data.begin(), sorted_data.end());
       
       thrust::device_vector<unsigned int> histo (numBins);
-      
-      thrust::sort (sorted_data.begin(), sorted_data.end());
-
       thrust::counting_iterator<unsigned int> search_begin (0);
       thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
 			   search_begin, search_begin + numBins,
