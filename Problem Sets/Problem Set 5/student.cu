@@ -54,6 +54,28 @@ void yourHisto(const unsigned int* const vals, //INPUT
   atomicAdd (&(histo[vals[myId]]), 1);
 }
 
+void denseHisto (const unsigned int* const d_vals, //INPUT
+		 unsigned int* const d_histo,      //OUTPUT
+		 const unsigned int numBins,
+		 const unsigned int numElems)
+{
+  thrust::device_ptr<unsigned int> vals =
+    thrust::device_pointer_cast ((unsigned int *)d_vals);
+  thrust::device_vector<unsigned int> sorted_data (numElems);
+  thrust::copy (vals, vals + numElems, sorted_data.begin());
+  thrust::sort (sorted_data.begin(), sorted_data.end());
+  
+  thrust::device_vector<unsigned int> histo (numBins);
+  thrust::counting_iterator<unsigned int> search_begin (0);
+  thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
+		       search_begin, search_begin + numBins,
+		       histo.begin());
+  
+  thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
+  thrust::copy (histo.begin(), histo.end(),
+		thrust::device_pointer_cast(d_histo)); 
+}
+
 void computeHistogram(const unsigned int* const d_vals, //INPUT
                       unsigned int* const d_histo,      //OUTPUT
                       const unsigned int numBins,
@@ -70,9 +92,6 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
   int threads = maxThreadsPerBlock;
   int blocks = (numElems / maxThreadsPerBlock) + 1;
 
-  thrust::device_vector<unsigned int> sorted_data (numElems);
-  thrust::device_vector<unsigned int> histo (numBins);
-
   switch (method)
     {
     case 0:
@@ -82,21 +101,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
       break;
     case 1:
       // Dense Histogram using binary search
-      thrust::device_ptr<unsigned int> vals =
-	thrust::device_pointer_cast ((unsigned int *)d_vals);
-      
-      thrust::copy (vals, vals + numElems, sorted_data.begin());
-      thrust::sort (sorted_data.begin(), sorted_data.end());
-      
-      thrust::counting_iterator<unsigned int> search_begin (0);
-      thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
-			   search_begin, search_begin + numBins,
-			   histo.begin());
-      
-      thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
-      thrust::copy (histo.begin(), histo.end(),
-		    thrust::device_pointer_cast(d_histo));
-      
+      denseHisto (d_vals, d_histo, numBins, numElems);
       break;
     case 2:
       break;
