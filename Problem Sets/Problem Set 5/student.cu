@@ -115,11 +115,9 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
   // FIXME: For some mysterious reason, the scatter operation does not
   // update the first element of the histogram corresponding to value
   // O.
-  if (histo_vals[histo_vals.begin()] == 0) {
-    thrust::copy (histo_counts.begin(),
-		  histo_counts.begin()+1,
-		  thrust::device_pointer_cast(d_histo));
-  }
+  thrust::copy (histo_counts.begin(),
+		histo_counts.begin()+1,
+		thrust::device_pointer_cast(d_histo));
 
   printVector ("Sparse Histo : ", thrust::device_pointer_cast(d_histo),
 	       thrust::device_pointer_cast(d_histo) + numBins);
