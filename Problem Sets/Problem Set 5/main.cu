@@ -48,7 +48,7 @@ int main(int argc, char** argv)
   timeval tv;
   gettimeofday(&tv, NULL);
 
-  srand(tv.tv_usec / 60); // To get same generation each minut
+  srand(tv.tv_sec / 60); // To get same generation each minut
 #endif
 
   //make the mean unpredictable, but close enough to the middle
