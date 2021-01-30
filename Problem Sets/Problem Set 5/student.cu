@@ -54,6 +54,17 @@ void yourHisto(const unsigned int* const vals, //INPUT
   atomicAdd (&(histo[vals[myId]]), 1);
 }
 
+template<typename InputIterator>
+void printVector(const char * const msg,
+		 InputIterator begin,
+		 InputIterator end)
+{
+  std::cout << msg << "  ";
+  thrust::copy(begin, end,
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+}
+
 void denseHisto (const unsigned int* const d_vals, //INPUT
 		 unsigned int* const d_histo,      //OUTPUT
 		 const unsigned int numBins,
@@ -75,22 +86,9 @@ void denseHisto (const unsigned int* const d_vals, //INPUT
   thrust::copy (histo.begin(), histo.end(),
 		thrust::device_pointer_cast(d_histo));
 
-  std::cout << "Dense  Histo : " << "  ";
-  thrust::copy(thrust::device_pointer_cast(d_histo),
-	       thrust::device_pointer_cast(d_histo) + numBins,
-	       std::ostream_iterator<unsigned int>(std::cout, " "));
-  std::cout << std::endl;
-}
-
-template<typename InputIterator>
-void printVector(const char * const msg,
-		 InputIterator begin,
-		 InputIterator end)
-{
-  std::cout << msg << "  ";
-  thrust::copy(begin, end,
-	       std::ostream_iterator<unsigned int>(std::cout, " "));
-  std::cout << std::endl;
+  printVector ("Dense  Histo : ",
+	       thrust::device_pointer_cast(d_histo),
+	       thrust::device_pointer_cast(d_histo) + numBins);
 }
 
 void sparseHisto (const unsigned int* const d_vals, //INPUT
