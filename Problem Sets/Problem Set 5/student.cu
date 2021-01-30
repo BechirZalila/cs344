@@ -81,6 +81,8 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 		  const unsigned int numBins,
 		  const unsigned int numElems)
 {
+
+  // FIXME: still not done yet!
   thrust::device_ptr<unsigned int> vals =
     thrust::device_pointer_cast ((unsigned int *)d_vals);
   thrust::device_vector<unsigned int> sorted_data (numElems);
