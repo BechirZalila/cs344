@@ -78,7 +78,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
       break;
     case 1:
       // Dense Histogram using binary search
-      thrust::device_vector<unsigned int> sorted_data (d_vals);
+      thrust::device_vector<const unsigned int> sorted_data (d_vals);
       thrust::device_vector<unsigned int> histo (numBins);
       thrust::sort (sorted_data.begin(), sorted_data.end());
 
