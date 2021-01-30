@@ -75,7 +75,7 @@ void denseHisto (const unsigned int* const d_vals, //INPUT
   thrust::copy (histo.begin(), histo.end(),
 		thrust::device_pointer_cast(d_histo));
 
-  std::cout << "Dense Histo : " << "  ";
+  std::cout << "Dense  Histo : " << "  ";
   thrust::copy(thrust::device_pointer_cast(d_histo),
 	       thrust::device_pointer_cast(d_histo) + numBins,
 	       std::ostream_iterator<unsigned int>(std::cout, " "));
