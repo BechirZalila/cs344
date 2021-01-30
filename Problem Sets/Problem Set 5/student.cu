@@ -60,7 +60,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
   const int maxThreadsPerBlock = 1024;
 
   int threads = maxThreadsPerBlock;
-  int blocks = (numPixels / maxThreadsPerBlock) + 1;
+  int blocks = (numElems / maxThreadsPerBlock) + 1;
 
   yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
   
