@@ -71,34 +71,20 @@ void denseHisto (unsigned int* const d_vals, //INPUT
 		 const unsigned int numBins,
 		 const unsigned int numElems)
 {
-  //  thrust::device_ptr<unsigned int> vals =
-  //    thrust::device_pointer_cast ((unsigned int *)d_vals);
-  // thrust::device_vector<unsigned int> sorted_data (numElems);
-  // thrust::copy (vals, vals + numElems, sorted_data.begin());
-  // thrust::sort (sorted_data.begin(), sorted_data.end());
   thrust::device_ptr<unsigned int> vals (d_vals);
-  
-  
-  //thrust::device_vector<unsigned int> histo (numBins);
   thrust::device_ptr<unsigned int> histo (d_histo);
   thrust::counting_iterator<unsigned int> search_begin (0);
 
   GpuTimer t1;
   t1.Start();
   thrust::sort (vals, vals + numElems);
-  //  thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
-  //		       search_begin, search_begin + numBins,
-  //		       histo.begin());
   thrust::upper_bound (vals, vals + numElems,
 		       search_begin, search_begin + numBins,
 		       histo);
-  
-  //  thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
-  //  thrust::copy (histo.begin(), histo.end(),
-  //		thrust::device_pointer_cast(d_histo));
   thrust::adjacent_difference (histo, histo + numBins, histo);
   t1.Stop();
   printf("Dense Histo ran in: %f msecs.\n", t1.Elapsed());
+
   //  printVector ("Dense  Histo : ",
   //	       thrust::device_pointer_cast(d_histo),
   //	       thrust::device_pointer_cast(d_histo) + numBins);
@@ -109,11 +95,6 @@ void sparseHisto (unsigned int* const d_vals,       //INPUT
 		  const unsigned int numBins,
 		  const unsigned int numElems)
 {
-  //  thrust::device_ptr<unsigned int> vals =
-  //    thrust::device_pointer_cast ((unsigned int *)d_vals);
-  //thrust::device_vector<unsigned int> sorted_data (numElems);
-  //thrust::copy (vals, vals + numElems, sorted_data.begin());
-  //thrust::sort (sorted_data.begin(), sorted_data.end());
   thrust::device_ptr<unsigned int> vals (d_vals);
   thrust::device_vector<unsigned int> histo_vals (numBins);
   thrust::device_vector<unsigned int> histo_counts (numBins);
@@ -121,9 +102,6 @@ void sparseHisto (unsigned int* const d_vals,       //INPUT
   GpuTimer t2;
   t2.Start();
   thrust::sort (vals, vals + numElems);
-  //thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
-  //			 thrust::constant_iterator<unsigned int>(1),
-  //			 histo_vals.begin(), histo_counts.begin());
   thrust::reduce_by_key (vals, vals + numElems,
 			 thrust::constant_iterator<unsigned int>(1),
 			 histo_vals.begin(), histo_counts.begin());
@@ -179,8 +157,6 @@ void computeHistogram(unsigned int* const d_vals, //INPUT
       break;
     case 2:
       // Sparse histogram using reduce_by_key
-      //  denseHisto (d_vals, d_histo, numBins, numElems);
-      //checkCudaErrors(cudaMemset(d_histo, 0, sizeof(unsigned int) * numBins));
       sparseHisto (d_vals, d_histo, numBins, numElems);
       break;
     default:
