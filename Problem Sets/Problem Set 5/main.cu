@@ -21,8 +21,19 @@
 void computeHistogram(unsigned int *const d_vals,
                       unsigned int* const d_histo,
                       const unsigned int numBins,
-                      const unsigned int numElems,
-		      int method);
+                      const unsigned int numElems);
+
+void denseHisto (thrust::device_ptr<unsigned int> &d_vals,
+		 thrust::device_ptr<unsigned int> &d_histo,
+		 const unsigned int numBins,
+		 const unsigned int numElems);
+
+void sparseHisto (thrust::device_ptr<unsigned int> &d_vals,
+		  thrust::device_ptr<unsigned int> &d_histo,
+		  thrust::device_vector<unsigned int> &d_histo_vals,
+		  thrust::device_vector<unsigned int> &d_histo_counts,
+		  const unsigned int numBins,
+		  const unsigned int numElems);
 
 int main(int argc, char** argv)
 {
@@ -77,14 +88,41 @@ int main(int argc, char** argv)
 
   checkCudaErrors(cudaMemcpy(d_vals, vals, sizeof(unsigned int) * numElems, cudaMemcpyHostToDevice));
 
-  timer.Start();
-  computeHistogram(d_vals, d_histo, numBins, numElems, method);
-  timer.Stop();
+  // For thrust dense and sparse histo implementation
+  thrust::device_ptr<unsigned int> d_thrust_vals (d_vals);
+  thrust::device_ptr<unsigned int> d_thrust_histo (d_histo);
+  thrust::device_vector<unsigned int> d_thrust_histo_vals (numBins);
+  thrust::device_vector<unsigned int> d_thrust_histo_counts (numBins);
+
+  switch (method)
+    {
+    case 0:
+      timer.Start();
+      computeHistogram(d_vals, d_histo, numBins, numElems);
+      timer.Stop();
+      break;
+    case 1:
+      timer.Start();
+      denseHisto (d_thrust_vals, d_thrust_histo, numBins, numElems);
+      timer.Stop();
+      break;
+    case 2:
+      timer.Start();
+      sparseHisto (d_thrust_vals, d_thrust_histo_vals,
+		   d_thrust_histo_counts, numBins, numElems);
+      timer.Stop();
+      break;
+    default:
+      std::cerr << "   Invalid method: " << method << "." << std::endl;
+      exit (1);
+      break;
+    }
   int err = printf("Your code ran in: %f msecs.\n", timer.Elapsed());
 
   if (err < 0) {
     //Couldn't print! Probably the student closed stdout - bad news
-    std::cerr << "Couldn't print timing information! STDOUT Closed!" << std::endl;
+    std::cerr << "Couldn't print timing information! STDOUT Closed!"
+	      << std::endl;
     exit(1);
   }
 
