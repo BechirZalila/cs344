@@ -115,25 +115,17 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 		   histo_vals.begin(),
 		   thrust::device_pointer_cast(d_histo));
 
-  std::cout << "Sparse Histo : " << "  ";
-  thrust::copy(thrust::device_pointer_cast(d_histo),
-	       thrust::device_pointer_cast(d_histo) + numBins,
-	       std::ostream_iterator<unsigned int>(std::cout, " "));
-  std::cout << std::endl;
+  printVector ("Sparse Histo : ",
+	       thrust::device_pointer_cast(d_histo),
+	       thrust::device_pointer_cast(d_histo) + numBins);
 
-  std::cout << "Histo Vals   : " << "  ";
-  thrust::copy(histo_vals.begin(),
-	       histo_vals.end(),
-	       std::ostream_iterator<unsigned int>(std::cout, " "));
-  std::cout << std::endl;
+  printVector ("Histo Vals   : ",
+	       histo_vals.begin(),
+	       histo_vals.end());
 
-  std::cout << "Histo Counts : " << "  ";
-  thrust::copy(histo_counts.begin(),
-	       histo_counts.end(),
-	       std::ostream_iterator<unsigned int>(std::cout, " "));
-  std::cout << std::endl;
-
-  
+  printVector ("Histo Counts : ",
+	       histo_counts.begin(),
+	       histo_counts.end());
 }
 
 void computeHistogram(const unsigned int* const d_vals, //INPUT
