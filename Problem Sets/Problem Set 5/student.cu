@@ -32,6 +32,7 @@
 #include <thrust/iterator/counting_iterator.h>
 
 #include "utils.h"
+#include "timer.h"
 
 // Very Simple Histo
 __global__
@@ -82,6 +83,8 @@ void denseHisto (unsigned int* const d_vals, //INPUT
   thrust::device_ptr<unsigned int> histo (d_histo);
   thrust::counting_iterator<unsigned int> search_begin (0);
 
+  Gputimer t1;
+  t1.Start();
   //  thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
   //		       search_begin, search_begin + numBins,
   //		       histo.begin());
@@ -93,13 +96,14 @@ void denseHisto (unsigned int* const d_vals, //INPUT
   //  thrust::copy (histo.begin(), histo.end(),
   //		thrust::device_pointer_cast(d_histo));
   thrust::adjacent_difference (histo, histo + numBins, histo);
-
+  t1.Stop();
+  printf("Dense Histo ran in: %f msecs.\n", t1.Elapsed());
   //  printVector ("Dense  Histo : ",
   //	       thrust::device_pointer_cast(d_histo),
   //	       thrust::device_pointer_cast(d_histo) + numBins);
 }
 
-void sparseHisto (unsigned int* const d_vals, //INPUT
+void sparseHisto (unsigned int* const d_vals,       //INPUT
 		  unsigned int* const d_histo,      //OUTPUT
 		  const unsigned int numBins,
 		  const unsigned int numElems)
@@ -118,6 +122,8 @@ void sparseHisto (unsigned int* const d_vals, //INPUT
   //thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
   //			 thrust::constant_iterator<unsigned int>(1),
   //			 histo_vals.begin(), histo_counts.begin());
+  Gputimer t2;
+  t2.Start();
   thrust::reduce_by_key (vals, vals + numElems,
 			 thrust::constant_iterator<unsigned int>(1),
 			 histo_vals.begin(), histo_counts.begin());
@@ -132,6 +138,8 @@ void sparseHisto (unsigned int* const d_vals, //INPUT
   thrust::copy (histo_counts.begin(),
 		histo_counts.begin()+1,
 		thrust::device_pointer_cast(d_histo));
+  t2.Stop();
+  printf("Sparse Histo ran in: %f msecs.\n", t2.Elapsed());
 
   //printVector ("Sparse Histo : ", thrust::device_pointer_cast(d_histo),
   //	       thrust::device_pointer_cast(d_histo) + numBins);
@@ -159,8 +167,12 @@ void computeHistogram(unsigned int* const d_vals, //INPUT
     {
     case 0:
       // Launch the simple naive histo
+      Gputimer t3;
+      t3.Start();
       yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
       cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+      t3.Stop();
+      printf("Cuda Histo ran in: %f msecs.\n", t3.Elapsed());
       break;
     case 1:
       // Dense Histogram using binary search
