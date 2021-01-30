@@ -111,21 +111,13 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 			 thrust::constant_iterator<unsigned int>(1),
 			 histo_vals.begin(), histo_counts.begin());
 
-  thrust::scatter (histo_counts.begin(), histo_counts.end(),
-		   histo_vals.begin(),
+  thrust::scatter (histo_counts.begin(), histo_counts.end(), histo_vals.begin(),
 		   thrust::device_pointer_cast(d_histo));
 
-  printVector ("Sparse Histo : ",
-	       thrust::device_pointer_cast(d_histo),
+  printVector ("Sparse Histo : ", thrust::device_pointer_cast(d_histo),
 	       thrust::device_pointer_cast(d_histo) + numBins);
-
-  printVector ("Histo Vals   : ",
-	       histo_vals.begin(),
-	       histo_vals.end());
-
-  printVector ("Histo Counts : ",
-	       histo_counts.begin(),
-	       histo_counts.end());
+  printVector ("Histo Vals   : ", histo_vals.begin(), histo_vals.end());
+  printVector ("Histo Counts : ", histo_counts.begin(), histo_counts.end());
 }
 
 void computeHistogram(const unsigned int* const d_vals, //INPUT
@@ -158,7 +150,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
     case 2:
       // Sparse histogram using reduce_by_key
       denseHisto (d_vals, d_histo, numBins, numElems);
-      checkCudaErrors(cudaMemset(d_histo, 0, sizeof(unsigned int) * numBins));
+      checkCudaErrors(cudaMemset(d_histo, 1, sizeof(unsigned int) * numBins));
       sparseHisto (d_vals, d_histo, numBins, numElems);
       break;
     default:
