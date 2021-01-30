@@ -104,11 +104,12 @@ void sparseHisto (unsigned int* const d_vals, //INPUT
 		  const unsigned int numBins,
 		  const unsigned int numElems)
 {
-  thrust::device_ptr<unsigned int> vals =
-    thrust::device_pointer_cast ((unsigned int *)d_vals);
+  //  thrust::device_ptr<unsigned int> vals =
+  //    thrust::device_pointer_cast ((unsigned int *)d_vals);
   //thrust::device_vector<unsigned int> sorted_data (numElems);
   //thrust::copy (vals, vals + numElems, sorted_data.begin());
   //thrust::sort (sorted_data.begin(), sorted_data.end());
+  thrust::device_ptr<unsigned int> vals (d_vals);
   thrust::sort (vals, vals + numElems);
   
   thrust::device_vector<unsigned int> histo_vals (numBins);
