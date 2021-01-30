@@ -74,7 +74,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
     case 2:
       break;
     default:
-      std::cerr << "   Invalid method:" << method << std::endl;
+      std::cerr << "   Invalid method: " << method << "." << std::endl;
       exit (1);
       break;
     }
