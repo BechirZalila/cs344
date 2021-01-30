@@ -77,7 +77,7 @@ void denseHisto (unsigned int* const d_vals, //INPUT
   // thrust::copy (vals, vals + numElems, sorted_data.begin());
   // thrust::sort (sorted_data.begin(), sorted_data.end());
   thrust::device_ptr<unsigned int> vals (d_vals);
-  thrust::sort (vals, vals + numElems);
+  
   
   //thrust::device_vector<unsigned int> histo (numBins);
   thrust::device_ptr<unsigned int> histo (d_histo);
@@ -85,6 +85,7 @@ void denseHisto (unsigned int* const d_vals, //INPUT
 
   GpuTimer t1;
   t1.Start();
+  thrust::sort (vals, vals + numElems);
   //  thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
   //		       search_begin, search_begin + numBins,
   //		       histo.begin());
@@ -114,16 +115,15 @@ void sparseHisto (unsigned int* const d_vals,       //INPUT
   //thrust::copy (vals, vals + numElems, sorted_data.begin());
   //thrust::sort (sorted_data.begin(), sorted_data.end());
   thrust::device_ptr<unsigned int> vals (d_vals);
-  thrust::sort (vals, vals + numElems);
-  
   thrust::device_vector<unsigned int> histo_vals (numBins);
   thrust::device_vector<unsigned int> histo_counts (numBins);
 
+  GpuTimer t2;
+  t2.Start();
+  thrust::sort (vals, vals + numElems);
   //thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
   //			 thrust::constant_iterator<unsigned int>(1),
   //			 histo_vals.begin(), histo_counts.begin());
-  GpuTimer t2;
-  t2.Start();
   thrust::reduce_by_key (vals, vals + numElems,
 			 thrust::constant_iterator<unsigned int>(1),
 			 histo_vals.begin(), histo_counts.begin());
