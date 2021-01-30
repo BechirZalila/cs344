@@ -24,7 +24,7 @@ void computeHistogram(const unsigned int *const d_vals,
                       const unsigned int numElems,
 		      int method);
 
-int main(int argc; char** argv)
+int main(int argc, char** argv)
 {
   const unsigned int numBins = 1024;
   const unsigned int numElems = 10000 * numBins;
