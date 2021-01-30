@@ -115,7 +115,7 @@ int main(int argc, char** argv)
       break;
     case 2:
       timer.Start();
-      sparseHisto (d_thrust_vals, d_thrust_histo_vals,
+      sparseHisto (d_thrust_vals, d_thrust_histo, d_thrust_histo_vals,
 		   d_thrust_histo_counts, numBins, numElems);
       timer.Stop();
       break;
