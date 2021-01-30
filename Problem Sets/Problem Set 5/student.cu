@@ -162,12 +162,11 @@ void computeHistogram(unsigned int* const d_vals, //INPUT
 
   int threads = maxThreadsPerBlock;
   int blocks = (numElems / maxThreadsPerBlock) + 1;
-
+  GpuTimer t3;
   switch (method)
     {
     case 0:
       // Launch the simple naive histo
-      GpuTimer t3;
       t3.Start();
       yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
       cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
