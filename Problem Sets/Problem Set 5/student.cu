@@ -38,6 +38,13 @@ void yourHisto(const unsigned int* const vals, //INPUT
   //Although we provide only one kernel skeleton,
   //feel free to use more if it will help you
   //write faster code
+
+  int myId = threadIdx.x + blockDim.x * blockIdx.x;
+
+  if (myId >= numVals)
+    return;
+
+  atomicAdd (&(histo[vals[myId]]), 1);
 }
 
 void computeHistogram(const unsigned int* const d_vals, //INPUT
@@ -50,5 +57,12 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
   //if you want to use/launch more than one kernel,
   //feel free
 
+  const int maxThreadsPerBlock = 1024;
+
+  int threads = maxThreadsPerBlock;
+  int blocks = (numPixels / maxThreadsPerBlock) + 1;
+
+  yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
+  
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 }
