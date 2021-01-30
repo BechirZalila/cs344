@@ -82,6 +82,17 @@ void denseHisto (const unsigned int* const d_vals, //INPUT
   std::cout << std::endl;
 }
 
+template<typename InputIterator>
+void printVector(const char * const msg,
+		 InputIterator begin,
+		 InputIterator end)
+{
+  std::cout << msg << "  ";
+  thrust::copy(begin, end,
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+}
+
 void sparseHisto (const unsigned int* const d_vals, //INPUT
 		  unsigned int* const d_histo,      //OUTPUT
 		  const unsigned int numBins,
