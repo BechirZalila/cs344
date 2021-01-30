@@ -16,6 +16,13 @@
 #include <thrust/random/normal_distribution.h>
 #include <thrust/random/uniform_int_distribution.h>
 
+#include <thrust/device_vector.h>
+#include <thrust/sort.h>
+#include <thrust/copy.h>
+#include <thrust/binary_search.h>
+#include <thrust/adjacent_difference.h>
+#include <thrust/iterator/counting_iterator.h>
+
 #include "reference_calc.h"
 
 void computeHistogram(unsigned int *const d_vals,
