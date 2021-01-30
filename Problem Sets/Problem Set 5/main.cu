@@ -84,7 +84,10 @@ int main(void)
   checkCudaErrors(cudaMemcpy(h_studentHisto, d_histo, sizeof(unsigned int) * numBins, cudaMemcpyDeviceToHost));
 
   //generate reference for the given mean
+  timer.Start();
   reference_calculation(vals, h_refHisto, numBins, numElems);
+  timer.Stop();
+  printf("Ref. code ran in: %f msecs.\n", timer.Elapsed());
 
   //Now do the comparison
   checkResultsExact(h_refHisto, h_studentHisto, numBins);
