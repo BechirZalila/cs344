@@ -87,9 +87,9 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
       
       thrust::device_vector<unsigned int> histo (numBins);
       thrust::counting_iterator<unsigned int> search_begin (0);
-      //thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
-      //		   search_begin, search_begin + numBins,
-      //		   histo);
+      thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
+			   search_begin, search_begin + numBins,
+			   histo.begin());
 
       thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
       thrust::copy (histo.begin(), histo.end(),
