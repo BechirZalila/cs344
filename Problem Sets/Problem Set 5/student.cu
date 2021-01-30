@@ -50,7 +50,8 @@ void yourHisto(const unsigned int* const vals, //INPUT
 void computeHistogram(const unsigned int* const d_vals, //INPUT
                       unsigned int* const d_histo,      //OUTPUT
                       const unsigned int numBins,
-                      const unsigned int numElems)
+                      const unsigned int numElems,
+		      const int method)
 {
   //TODO Launch the yourHisto kernel
 
@@ -62,7 +63,17 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
   int threads = maxThreadsPerBlock;
   int blocks = (numElems / maxThreadsPerBlock) + 1;
 
-  yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
-  
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  switch (method)
+    {
+    case 0:
+      yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
+      cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+      break;
+    case 1:
+      break;
+    case 2:
+      break;
+    default:
+      break;
+    }
 }

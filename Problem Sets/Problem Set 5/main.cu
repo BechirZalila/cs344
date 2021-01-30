@@ -23,7 +23,7 @@ void computeHistogram(const unsigned int *const d_vals,
                       const unsigned int numBins,
                       const unsigned int numElems);
 
-int main(void)
+int main(int argc; char** argv)
 {
   const unsigned int numBins = 1024;
   const unsigned int numElems = 10000 * numBins;
@@ -33,6 +33,13 @@ int main(void)
   unsigned int *h_vals = new unsigned int[numElems];
   unsigned int *h_studentHisto = new unsigned int[numBins];
   unsigned int *h_refHisto = new unsigned int[numBins];
+
+  if (argc != 2) {
+    std::cerr << "Usage: ./HW5 method" << std::endl;
+    exit (1);
+  }
+
+  int method = atoi (argv[1]);
 
 #if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
   srand(GetTickCount());
@@ -70,7 +77,7 @@ int main(void)
   checkCudaErrors(cudaMemcpy(d_vals, vals, sizeof(unsigned int) * numElems, cudaMemcpyHostToDevice));
 
   timer.Start();
-  computeHistogram(d_vals, d_histo, numBins, numElems);
+  computeHistogram(d_vals, d_histo, numBins, numElems, method);
   timer.Stop();
   int err = printf("Your code ran in: %f msecs.\n", timer.Elapsed());
 
