@@ -72,20 +72,26 @@ void denseHisto (unsigned int* const d_vals, //INPUT
 {
   thrust::device_ptr<unsigned int> vals =
     thrust::device_pointer_cast ((unsigned int *)d_vals);
-  thrust::device_vector<unsigned int> sorted_data (numElems);
-  thrust::copy (vals, vals + numElems, sorted_data.begin());
-  thrust::sort (sorted_data.begin(), sorted_data.end());
+  // thrust::device_vector<unsigned int> sorted_data (numElems);
+  // thrust::copy (vals, vals + numElems, sorted_data.begin());
+  // thrust::sort (sorted_data.begin(), sorted_data.end());
+  thrust::sort (vals, vals + numElems);
   
-  thrust::device_vector<unsigned int> histo (numBins);
+  //thrust::device_vector<unsigned int> histo (numBins);
+  thrust::device_ptr<unsigned int> histo (d_histo);
   thrust::counting_iterator<unsigned int> search_begin (0);
 
-  thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
+  //  thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
+  //		       search_begin, search_begin + numBins,
+  //		       histo.begin());
+  thrust::upper_bound (vals, vals + numElems,
 		       search_begin, search_begin + numBins,
-		       histo.begin());
+		       histo);
   
-  thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
-  thrust::copy (histo.begin(), histo.end(),
-		thrust::device_pointer_cast(d_histo));
+  //  thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
+  //  thrust::copy (histo.begin(), histo.end(),
+  //		thrust::device_pointer_cast(d_histo));
+  thrust::adjacent_difference (histo, histo + numBins, histo);
 
   //  printVector ("Dense  Histo : ",
   //	       thrust::device_pointer_cast(d_histo),
