@@ -96,8 +96,6 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 		  const unsigned int numBins,
 		  const unsigned int numElems)
 {
-
-  // FIXME: still not done yet!
   thrust::device_ptr<unsigned int> vals =
     thrust::device_pointer_cast ((unsigned int *)d_vals);
   thrust::device_vector<unsigned int> sorted_data (numElems);
@@ -113,7 +111,15 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 
   thrust::scatter (histo_counts.begin(), histo_counts.end(), histo_vals.begin(),
 		   thrust::device_pointer_cast(d_histo));
-  thrust::copy (histo_counts.begin(), histo_counts.begin(), thrust::device_pointer_cast(d_histo));
+
+  // FIXME: For some mysterious reason, the scatter operation does not
+  // update the first element of the histogram corresponding to value
+  // O.
+  if (histo_vals[histo_vals.begin()] == 0) {
+    thrust::copy (histo_counts.begin(),
+		  histo_counts.begin()+1,
+		  thrust::device_pointer_cast(d_histo));
+  }
 
   printVector ("Sparse Histo : ", thrust::device_pointer_cast(d_histo),
 	       thrust::device_pointer_cast(d_histo) + numBins);
