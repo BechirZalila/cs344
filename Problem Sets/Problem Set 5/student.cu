@@ -73,7 +73,13 @@ void denseHisto (const unsigned int* const d_vals, //INPUT
   
   thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
   thrust::copy (histo.begin(), histo.end(),
-		thrust::device_pointer_cast(d_histo)); 
+		thrust::device_pointer_cast(d_histo));
+
+  std::cout << "Dense Histo : " << "  ";
+  thrust::copy(thrust::device_pointer_cast(d_histo),
+	       thrust::device_pointer_cast(d_histo) + numBins,
+	       std::ostream_iterator<T>(std::cout, " "));
+  std::cout << std::endl;
 }
 
 void sparseHisto (const unsigned int* const d_vals, //INPUT
@@ -98,7 +104,9 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 
   thrust::scatter (histo_counts.begin(), histo_counts.end(),
 		   histo_vals.begin(),
-		   thrust::device_pointer_cast(d_histo)); 
+		   thrust::device_pointer_cast(d_histo));
+
+  
 }
 
 void computeHistogram(const unsigned int* const d_vals, //INPUT
