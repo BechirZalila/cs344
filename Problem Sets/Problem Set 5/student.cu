@@ -106,6 +106,12 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 		   histo_vals.begin(),
 		   thrust::device_pointer_cast(d_histo));
 
+  std::cout << "Sparse Histo : " << "  ";
+  thrust::copy(thrust::device_pointer_cast(d_histo),
+	       thrust::device_pointer_cast(d_histo) + numBins,
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+
   
 }
 
