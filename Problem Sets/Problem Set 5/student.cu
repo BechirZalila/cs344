@@ -76,6 +76,28 @@ void denseHisto (const unsigned int* const d_vals, //INPUT
 		thrust::device_pointer_cast(d_histo)); 
 }
 
+void sparseHisto (const unsigned int* const d_vals, //INPUT
+		  unsigned int* const d_histo,      //OUTPUT
+		  const unsigned int numBins,
+		  const unsigned int numElems)
+{
+  thrust::device_ptr<unsigned int> vals =
+    thrust::device_pointer_cast ((unsigned int *)d_vals);
+  thrust::device_vector<unsigned int> sorted_data (numElems);
+  thrust::copy (vals, vals + numElems, sorted_data.begin());
+  thrust::sort (sorted_data.begin(), sorted_data.end());
+  
+  thrust::device_vector<unsigned int> histo_vals (numBins);
+  thrust::device_vector<unsigned int> histo_counts (numBins);
+
+  thrust::reduce_by_key (sorted_data.begin(), sorted_data.end(),
+			 thrust::constant_iterator<unsigned_int>(1),
+			 histo_values.begin(), histo_count.begin());
+
+  thrust::copy (histo_count.begin(), histo_count.end(),
+		thrust::device_pointer_cast(d_histo)); 
+}
+
 void computeHistogram(const unsigned int* const d_vals, //INPUT
                       unsigned int* const d_histo,      //OUTPUT
                       const unsigned int numBins,
@@ -104,6 +126,8 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
       denseHisto (d_vals, d_histo, numBins, numElems);
       break;
     case 2:
+      // Sparse histogram using reduce_by_key
+      sparseHisto (d_vals, d_histo, numBins, numElems);
       break;
     default:
       std::cerr << "   Invalid method: " << method << "." << std::endl;
