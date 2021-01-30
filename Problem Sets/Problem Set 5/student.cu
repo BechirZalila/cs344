@@ -73,10 +73,10 @@ void denseHisto (unsigned int* const d_vals, //INPUT
 {
   thrust::device_ptr<unsigned int> vals (d_vals);
   thrust::device_ptr<unsigned int> histo (d_histo);
-  thrust::counting_iterator<unsigned int> search_begin (0);
-
+  
   GpuTimer t1;
   t1.Start();
+  thrust::counting_iterator<unsigned int> search_begin (0);
   thrust::sort (vals, vals + numElems);
   thrust::upper_bound (vals, vals + numElems,
 		       search_begin, search_begin + numBins,
