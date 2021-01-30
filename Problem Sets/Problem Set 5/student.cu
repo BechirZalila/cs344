@@ -94,8 +94,9 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 			 thrust::constant_iterator<unsigned int>(1),
 			 histo_vals.begin(), histo_counts.begin());
 
-  thrust::copy (histo_counts.begin(), histo_counts.end(),
-		thrust::device_pointer_cast(d_histo)); 
+  thrust::scatter (histo_counts.begin(), histo_counts.end(),
+		   histo_vals.begin(),
+		   thrust::device_pointer_cast(d_histo)); 
 }
 
 void computeHistogram(const unsigned int* const d_vals, //INPUT
