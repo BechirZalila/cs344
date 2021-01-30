@@ -112,6 +112,18 @@ void sparseHisto (const unsigned int* const d_vals, //INPUT
 	       std::ostream_iterator<unsigned int>(std::cout, " "));
   std::cout << std::endl;
 
+  std::cout << "Histo Vals   : " << "  ";
+  thrust::copy(histo_vals.begin(),
+	       histo_vals.end(),
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+
+  std::cout << "Histo Counts : " << "  ";
+  thrust::copy(histo_counts.begin(),
+	       histo_counts.end(),
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+
   
 }
 
