@@ -150,7 +150,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
     case 2:
       // Sparse histogram using reduce_by_key
       denseHisto (d_vals, d_histo, numBins, numElems);
-      checkCudaErrors(cudaMemset(d_histo, 1, sizeof(unsigned int) * numBins));
+      checkCudaErrors(cudaMemset(d_histo, 0, sizeof(unsigned int) * numBins));
       sparseHisto (d_vals, d_histo, numBins, numElems);
       break;
     default:
