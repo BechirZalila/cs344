@@ -78,8 +78,13 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
       break;
     case 1:
       // Dense Histogram using binary search
-      thrust::device_vector<const unsigned int> sorted_data (d_vals);
+      thrust::device_ptr<unsigned int> vals =
+	thrust::device_pointer_cast (d_vals);
+      thrust::device_vector<unsigned int> sorted_data (NumElems);
+      thrust::copy (vals, vals + numElems, sorted_data.begin());
+      
       thrust::device_vector<unsigned int> histo (numBins);
+      
       thrust::sort (sorted_data.begin(), sorted_data.end());
 
       thrust::counting_iterator<unsigned int> search_begin (0);
@@ -89,7 +94,7 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
 
       thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
       thrust::copy (histo.begin(), histo.end(),
-		    thrust::device_ptr_cast(d_histo));
+		    thrust::device_pointer_cast(d_histo));
       
       break;
     case 2:
