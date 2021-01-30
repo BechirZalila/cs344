@@ -14,7 +14,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # collect source files
 
 file( GLOB  hdr *.hpp *.h )
-file( GLOB  cu  *.cu)
+file( GLOB  cu  main.cu student.cu)
 
 SET (HW5_files reference_calc.cpp)
 
