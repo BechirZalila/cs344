@@ -24,9 +24,15 @@
 
 */
 
+#include <thrust/device_vector.h>
+#include <thrust/sort.h>
+#include <thrust/copy.h>
+#include <thrust/adjacent_difference.h>
+#include <thrust/iterator/counting_iterator.h>
 
 #include "utils.h"
 
+// Very Simple Histo
 __global__
 void yourHisto(const unsigned int* const vals, //INPUT
                unsigned int* const histo,      //OUPUT
@@ -66,10 +72,25 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
   switch (method)
     {
     case 0:
+      // Launch the simple naive histo
       yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
       cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
       break;
     case 1:
+      // Dense Histogram using binary search
+      thrust::device_vector<unsigned int> sorted_data (d_vals);
+      thrust::device_vector<unsigned int> histo (numBins);
+      thrust::sort (sorted_data.begin(), sorted_data.end());
+
+      thrust::counting_iterator<unsigned int> search_begin (0);
+      thrust::upper_bound (sorted_data.begin(), sorted_data.end(),
+			   search_begin, search_begin + numBins,
+			   histo);
+
+      thrust::adjacent_difference (histo.begin(), histo.end(), histo.begin());
+      thrust::copy (histo.begin(), histo.end(),
+		    thrust::device_ptr_cast(d_histo));
+      
       break;
     case 2:
       break;
