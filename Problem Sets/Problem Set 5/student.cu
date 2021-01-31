@@ -95,7 +95,7 @@ void betterHisto(const unsigned int* const vals, //INPUT
   unsigned int stride = blockDim.x * gridDim.x;
   int i = myId;
   while (i < numBins) {
-    atomicAdd (&localHisto[vals[myId]], 1);
+    atomicAdd (&localHisto[vals[i]], 1);
     i += stride;
   }
   __syncthreads();
