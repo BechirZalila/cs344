@@ -59,7 +59,7 @@ __global__
 void betterHisto(const unsigned int* const vals, //INPUT
 		 unsigned int* const histo,      //OUPUT
 		 int numVals,
-		 in numBins)
+		 int numBins)
 {
   //TODO fill in this kernel to calculate the histogram
   //as quickly as possible
