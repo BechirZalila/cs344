@@ -154,14 +154,14 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-  // Print the histogram
-  pprintVector ("Histo: ", h_studentHisto, h_studentHisto + numBins);
-
   // copy the student-computed histogram back to the host
   checkCudaErrors(cudaMemcpy(h_studentHisto, d_histo,
 			     sizeof(unsigned int) * numBins,
 			     cudaMemcpyDeviceToHost));
 
+  // Print the histogram
+  pprintVector ("Histo: ", h_studentHisto, h_studentHisto + numBins);
+  
   //generate reference for the given mean
   timer.Start();
   reference_calculation(vals, h_refHisto, numBins, numElems);
