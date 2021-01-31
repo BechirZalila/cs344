@@ -160,7 +160,7 @@ int main(int argc, char** argv)
 			     cudaMemcpyDeviceToHost));
 
   // Print the histogram
-  pprintVector ("Histo: ", h_studentHisto, h_studentHisto + numBins);
+  //pprintVector ("Histo: ", h_studentHisto, h_studentHisto + numBins);
   
   //generate reference for the given mean
   timer.Start();
