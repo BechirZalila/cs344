@@ -160,7 +160,7 @@ int main(void)
   thrust::uniform_int_distribution<int> dist(0, 9);
 
   const int N = 40;
-  const int S = 1;
+  const int S = 4;
 
   // generate random data on the host
   thrust::host_vector<int> input(N);
