@@ -144,13 +144,13 @@ void sparseHisto (thrust::device_ptr<unsigned int> &d_vals,
   // update the first element of the histogram corresponding to value
   // O.
 
-  /*unsigned int a;
+  unsigned int a;
   thrust::copy (d_histo_vals.begin(), d_histo_vals.begin() + 1, &a);
   if (a == 0) {
     thrust::copy (d_histo_counts.begin(),
 		  d_histo_counts.begin()+1,
 		  thrust::device_pointer_cast(d_histo));
-		  }*/
+  }
 
   thrust::device_vector<unsigned int> xxxx (numBins);
   thrust::scatter (d_histo_counts.begin(), d_histo_counts.end(),
