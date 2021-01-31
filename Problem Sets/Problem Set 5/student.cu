@@ -80,21 +80,27 @@ void betterHisto(const unsigned int* const vals, //INPUT
   //write faster code
 
   int myId = threadIdx.x + blockDim.x * blockIdx.x;
+  unsigned int stride, i;
   extern __shared__ unsigned int localHisto[]; // Allocated on kernel invocation
 
   if (myId >= numVals)
     return;
 
   // Reset local histo.
-  localHisto[threadIdx.x] = 0;
+  stride = blockDim.x;
+  i = threadIdx.x;
+  while (i < numBins) {
+    localHisto[i] = 0;
+    i += stride;
+  }
   //  if (myId < numBins) {
   // localHisto[myId] = 0;
   //}
   __syncthreads();
 
   // Compute local histogram
-  unsigned int stride = blockDim.x * gridDim.x;
-  int i = myId;
+  stride = blockDim.x * gridDim.x;
+  i = myId;
   while (i < numVals) {
     atomicAdd (&localHisto[vals[i]], 1);
     i += stride;
@@ -102,7 +108,12 @@ void betterHisto(const unsigned int* const vals, //INPUT
   __syncthreads();
 
   // Merge histograms.
-  atomicAdd (&(histo[threadIdx.x]), localHisto[threadIdx.x]);
+  stride = blockDim.x;
+  i = threadIdx.x;
+  while (i < numBins) {
+    atomicAdd (&(histo[i]), localHisto[i]);
+    i += stride;
+  }
   //  if (myId < numBins) {
   //  atomicAdd (&(histo[myId]), localHisto[myId]);
   //}
