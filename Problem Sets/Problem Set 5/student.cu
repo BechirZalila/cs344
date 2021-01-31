@@ -52,6 +52,12 @@ void yourHisto(const unsigned int* const vals, //INPUT
     return;
 
   atomicAdd (&(histo[vals[myId]]), 1);
+
+    __syncthreads();
+  
+  if (myId == 0) {
+    printVector ("Simple Histo: ", histo, histo + numBins);
+  }
 }
 
 // Slighly better histo
@@ -91,6 +97,8 @@ void betterHisto(const unsigned int* const vals, //INPUT
     atomicAdd (&(histo[myId]), localHisto[myId]);
   }
 
+  __syncthreads();
+  
   if (myId == 0) {
     printVector ("Better Histo: ", histo, histo + numBins);
   }
