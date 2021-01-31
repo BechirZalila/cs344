@@ -54,6 +54,45 @@ void yourHisto(const unsigned int* const vals, //INPUT
   atomicAdd (&(histo[vals[myId]]), 1);
 }
 
+// Slighly better histo
+__global__
+void betterHisto(const unsigned int* const vals, //INPUT
+		 unsigned int* const histo,      //OUPUT
+		 int numVals,
+		 in numBins)
+{
+  //TODO fill in this kernel to calculate the histogram
+  //as quickly as possible
+
+  //Although we provide only one kernel skeleton,
+  //feel free to use more if it will help you
+  //write faster code
+
+  int myId = threadIdx.x + blockDim.x * blockIdx.x;
+  extern __shared__ unsigned int localHisto[]; // Allocated on kernel invocation
+
+  if (myId >= numVals)
+    return;
+
+  // Reset local histo. Since we are not sure what is the size of a
+  // thread block compared to the number of bins, and to equilibrate
+  // the initialization task, we do the following:
+  for (int i = myId; i < numBins; i+=max (numBins - 1, 1)) {
+    localHisto[i] = 0;
+  }
+
+  __syncthreads();
+
+  // Compute local histogram
+  atomicAdd (&localHisto[vals[myId]], 1);
+  __syncthreads();
+
+  // Merge histograms. Same mechanism as above:
+  for (int i = myId; i < numBins; i+=max (numBins - 1, 1)) {
+    atomicAdd (&(histo[i]), localHisto[i]);
+  }
+}
+
 template<typename InputIterator>
 void printVector(const char * const msg,
 		 InputIterator begin,
@@ -112,6 +151,9 @@ void sparseHisto (thrust::device_ptr<unsigned int> &d_vals,
   //printVector ("Histo Counts : ", d_histo_counts.begin(), d_histo_counts.end());
 }
 
+// Max number of threads per block
+const int maxThreadsPerBlock = 1024;
+
 void computeHistogram(const unsigned int* const d_vals, //INPUT
                       unsigned int* const d_histo,      //OUTPUT
                       const unsigned int numBins,
@@ -122,11 +164,27 @@ void computeHistogram(const unsigned int* const d_vals, //INPUT
   //if you want to use/launch more than one kernel,
   //feel free
 
-  const int maxThreadsPerBlock = 1024;
-
   int threads = maxThreadsPerBlock;
   int blocks = (numElems / maxThreadsPerBlock) + 1;
 
   yourHisto<<<blocks, threads>>>(d_vals, d_histo, numElems);
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+}
+
+void computeBetterHistogram(const unsigned int* const d_vals, //INPUT
+			    unsigned int* const d_histo,      //OUTPUT
+			    const unsigned int numBins,
+			    const unsigned int numElems)
+{
+  //TODO Launch the yourHisto kernel
+
+  //if you want to use/launch more than one kernel,
+  //feel free
+
+  int threads = maxThreadsPerBlock;
+  int blocks = (numElems / maxThreadsPerBlock) + 1;
+
+  betterHisto<<<blocks, threads, numBins * sizeof(unsigned int)>>>
+    (d_vals, d_histo, numElems);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 }
