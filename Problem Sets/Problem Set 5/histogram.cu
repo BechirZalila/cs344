@@ -125,6 +125,9 @@ void sparse_histogram(const Vector1& input,
   // print the sorted data
   print_vector("sorted data", data);
 
+  // dense histo
+  thrust::device_vector<IndexType> dense_histo (data.back() + 1);
+
   // number of histogram bins is equal to number of unique values (assumes data.size() > 0)
   IndexType num_bins = thrust::inner_product(data.begin(), data.end() - 1,
                                              data.begin() + 1,
@@ -145,6 +148,11 @@ void sparse_histogram(const Vector1& input,
   // print the sparse histogram
   print_vector("histogram values", histogram_values);
   print_vector("histogram counts", histogram_counts);
+
+  thrust::scatter (histogram_counts.begin(), histogram_counts.end(),
+		   histo_values.begin(),
+		   dense_histo.begin());
+  print_vector ("dense histo", dense_histo);
 }
 
 int main(void)
