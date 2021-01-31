@@ -79,6 +79,8 @@ void betterHisto(const unsigned int* const vals, //INPUT
   //feel free to use more if it will help you
   //write faster code
 
+  assert (numVals >= numBins);
+  
   int myId = threadIdx.x + blockDim.x * blockIdx.x;
   extern __shared__ unsigned int localHisto[]; // Allocated on kernel invocation
 
