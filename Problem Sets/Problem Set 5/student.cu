@@ -77,8 +77,8 @@ void betterHisto(const unsigned int* const vals, //INPUT
   // Reset local histo. Since we are not sure what is the size of a
   // thread block compared to the number of bins, and to equilibrate
   // the initialization task, we do the following:
-  for (int i = myId; i < numBins; i+=max (numBins - 1, 1)) {
-    localHisto[i] = 0;
+  if (myId < numBins) {
+    localHisto[myId] = 0;
   }
 
   __syncthreads();
@@ -88,8 +88,8 @@ void betterHisto(const unsigned int* const vals, //INPUT
   __syncthreads();
 
   // Merge histograms. Same mechanism as above:
-  for (int i = myId; i < numBins; i+=max (numBins - 1, 1)) {
-    atomicAdd (&(histo[i]), localHisto[i]);
+  if (myId < numBins) {
+    atomicAdd (&(histo[myId]), localHisto[myId]);
   }
 }
 
@@ -187,6 +187,5 @@ void computeBetterHistogram(const unsigned int* const d_vals, //INPUT
   betterHisto<<<blocks, threads, numBins * sizeof(unsigned int)>>>
     (d_vals, d_histo, numElems, numBins);
 
-  printVector ("Better Histo : ", d_histo, d_histo + numBins);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 }
