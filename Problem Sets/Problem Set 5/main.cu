@@ -20,6 +20,17 @@
 
 #include "reference_calc.h"
 
+template<typename InputIterator>
+void pprintVector(const char * const msg,
+		  InputIterator begin,
+		  InputIterator end)
+{
+  std::cout << msg << "  ";
+  thrust::copy(begin, end,
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+}
+
 void computeHistogram(const unsigned int *const d_vals,
                       unsigned int* const d_histo,
                       const unsigned int numBins,
@@ -140,6 +151,9 @@ int main(int argc, char** argv)
 
   // copy the student-computed histogram back to the host
   checkCudaErrors(cudaMemcpy(h_studentHisto, d_histo, sizeof(unsigned int) * numBins, cudaMemcpyDeviceToHost));
+
+  // Print the histogram
+  pprintVector ("Histo: ", h_studentHisto, h_studentHisto + numBins);
 
   //generate reference for the given mean
   timer.Start();
