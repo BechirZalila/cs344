@@ -85,16 +85,19 @@ void betterHisto(const unsigned int* const vals, //INPUT
   if (myId >= numVals)
     return;
 
-  // Reset local histo. Since we are not sure what is the size of a
-  // thread block compared to the number of bins, and to equilibrate
-  // the initialization task, we do the following:
+  // Reset local histo.
   if (myId < numBins) {
     localHisto[myId] = 0;
   }
   __syncthreads();
 
   // Compute local histogram
-  atomicAdd (&localHisto[vals[myId]], 1);
+  unsigned int stride = blockDim.x * gridDim.x;
+  int i = myId;
+  while (i < numBins) {
+    atomicAdd (&localHisto[vals[myId]], 1);
+    i += stride;
+  }
   __syncthreads();
 
   // Merge histograms. Same mechanism as above:
