@@ -25,6 +25,11 @@ void computeHistogram(const unsigned int *const d_vals,
                       const unsigned int numBins,
                       const unsigned int numElems);
 
+void computeBetterHistogram(const unsigned int *const d_vals,
+			    unsigned int* const d_histo,
+			    const unsigned int numBins,
+			    const unsigned int numElems);
+
 void denseHisto (thrust::device_ptr<unsigned int> &d_vals,
 		 thrust::device_ptr<unsigned int> &d_histo,
 		 const unsigned int numBins,
@@ -105,10 +110,15 @@ int main(int argc, char** argv)
       break;
     case 1:
       timer.Start();
-      denseHisto (d_thrust_vals, d_thrust_histo, numBins, numElems);
+      computeBetterHistogram(d_vals, d_histo, numBins, numElems);
       timer.Stop();
       break;
     case 2:
+      timer.Start();
+      denseHisto (d_thrust_vals, d_thrust_histo, numBins, numElems);
+      timer.Stop();
+      break;
+    case 3:
       timer.Start();
       sparseHisto (d_thrust_vals, d_thrust_histo, d_thrust_histo_vals,
 		   d_thrust_histo_counts, numBins, numElems);
