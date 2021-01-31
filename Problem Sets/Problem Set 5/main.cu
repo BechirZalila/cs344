@@ -20,6 +20,17 @@
 
 #include "reference_calc.h"
 
+template<typename InputIterator>
+void pprintVector(const char * const msg,
+		  InputIterator begin,
+		  InputIterator end)
+{
+  std::cout << msg << "  ";
+  thrust::copy(begin, end,
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+}
+
 void computeHistogram(const unsigned int *const d_vals,
                       unsigned int* const d_histo,
                       const unsigned int numBins,
@@ -65,7 +76,7 @@ int main(int argc, char** argv)
 #else
   timeval tv;
   gettimeofday(&tv, NULL);
-  long seed = tv.tv_sec / 60; //400361; //tv.tv_usec;// / 60;
+  long seed = 26868219; //tv.tv_sec / 60; //400361; //tv.tv_usec;// / 60;
   srand(seed); // To get same generation each minut
   printf ("Seed: %ld\n", seed);
 #endif
@@ -142,6 +153,9 @@ int main(int argc, char** argv)
 	      << std::endl;
     exit(1);
   }
+
+  // Print the histogram
+  pprintVector ("Histo: ", h_studentHisto, h_studentHisto + numBins);
 
   // copy the student-computed histogram back to the host
   checkCudaErrors(cudaMemcpy(h_studentHisto, d_histo,
