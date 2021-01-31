@@ -152,13 +152,8 @@ void sparseHisto (thrust::device_ptr<unsigned int> &d_vals,
 		  thrust::device_pointer_cast(d_histo));
   }
 
-  thrust::device_vector<unsigned int> xxxx (numBins);
-  thrust::scatter (d_histo_counts.begin(), d_histo_counts.end(),
-		   d_histo_vals.begin(), xxxx.begin());
-
-  printVector ("xxxx  Histo : ", xxxx.begin(), xxxx.end());
-  printVector ("Dense Histo : ", thrust::device_pointer_cast(d_histo),
-	       thrust::device_pointer_cast(d_histo) + numBins);
+  //printVector ("Dense Histo : ", thrust::device_pointer_cast(d_histo),
+  //	       thrust::device_pointer_cast(d_histo) + numBins);
   //printVector ("Histo Vals   : ", d_histo_vals.begin(), d_histo_vals.end());
   //printVector ("Histo Counts : ", d_histo_counts.begin(), d_histo_counts.end());
 }
