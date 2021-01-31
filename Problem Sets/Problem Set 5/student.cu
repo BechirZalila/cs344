@@ -186,5 +186,7 @@ void computeBetterHistogram(const unsigned int* const d_vals, //INPUT
 
   betterHisto<<<blocks, threads, numBins * sizeof(unsigned int)>>>
     (d_vals, d_histo, numElems, numBins);
+
+  printVector ("Better Histo : ", d_histo, d_histo + numBins);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 }
