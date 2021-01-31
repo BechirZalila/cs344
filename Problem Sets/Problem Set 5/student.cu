@@ -97,7 +97,7 @@ void betterHisto(const unsigned int* const vals, //INPUT
   // Compute local histogram
   unsigned int stride = blockDim.x * gridDim.x;
   int i = myId;
-  while (i < numBins) {
+  while (i < numVals) {
     atomicAdd (&localHisto[vals[i]], 1);
     i += stride;
   }
