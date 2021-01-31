@@ -80,7 +80,6 @@ void betterHisto(const unsigned int* const vals, //INPUT
   if (myId < numBins) {
     localHisto[myId] = 0;
   }
-
   __syncthreads();
 
   // Compute local histogram
@@ -90,6 +89,10 @@ void betterHisto(const unsigned int* const vals, //INPUT
   // Merge histograms. Same mechanism as above:
   if (myId < numBins) {
     atomicAdd (&(histo[myId]), localHisto[myId]);
+  }
+
+  if (myId == 0) {
+    printVector ("Better Histo: ", histo, histo + numBins);
   }
 }
 
