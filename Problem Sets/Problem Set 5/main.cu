@@ -20,17 +20,6 @@
 
 #include "reference_calc.h"
 
-template<typename InputIterator>
-void pprintVector(const char * const msg,
-		  InputIterator begin,
-		  InputIterator end)
-{
-  std::cout << msg << "  ";
-  thrust::copy(begin, end,
-	       std::ostream_iterator<unsigned int>(std::cout, " "));
-  std::cout << std::endl;
-}
-
 void computeHistogram(const unsigned int *const d_vals,
                       unsigned int* const d_histo,
                       const unsigned int numBins,
@@ -116,21 +105,25 @@ int main(int argc, char** argv)
   switch (method)
     {
     case 0:
+      printf ("Simple Histo\n");
       timer.Start();
       computeHistogram(d_vals, d_histo, numBins, numElems);
       timer.Stop();
       break;
     case 1:
+      printf ("Shmem Histo\n");
       timer.Start();
       computeBetterHistogram(d_vals, d_histo, numBins, numElems);
       timer.Stop();
       break;
     case 2:
+      printf ("Thrust Dense Histo\n");
       timer.Start();
       denseHisto (d_thrust_vals, d_thrust_histo, numBins, numElems);
       timer.Stop();
       break;
     case 3:
+      printf ("Thrust Sparse Histo\n");
       timer.Start();
       sparseHisto (d_thrust_vals, d_thrust_histo, d_thrust_histo_vals,
 		   d_thrust_histo_counts, numBins, numElems);
@@ -151,10 +144,9 @@ int main(int argc, char** argv)
   }
 
   // copy the student-computed histogram back to the host
-  checkCudaErrors(cudaMemcpy(h_studentHisto, d_histo, sizeof(unsigned int) * numBins, cudaMemcpyDeviceToHost));
-
-  // Print the histogram
-  pprintVector ("Histo: ", h_studentHisto, h_studentHisto + numBins);
+  checkCudaErrors(cudaMemcpy(h_studentHisto, d_histo,
+			     sizeof(unsigned int) * numBins,
+			     cudaMemcpyDeviceToHost));
 
   //generate reference for the given mean
   timer.Start();
