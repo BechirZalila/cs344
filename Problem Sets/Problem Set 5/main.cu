@@ -78,7 +78,7 @@ int main(int argc, char** argv)
   gettimeofday(&tv, NULL);
   long seed = tv.tv_usec;// / 60;
   srand(seed); // To get same generation each minut
-  printf ("Seed: %ld\n");
+  printf ("Seed: %ld\n", seed);
 #endif
 
   //make the mean unpredictable, but close enough to the middle
