@@ -86,19 +86,22 @@ void betterHisto(const unsigned int* const vals, //INPUT
   if (myId >= numVals)
     return;
 
-  // Reset local histo.
+  // Reset local histo. The localHisto array is shared among the
+  // threads of 1 block. To ensure all its elements are initialised
+  // exacty once and in case of a histo bin greater that a block, we
+  // use a stride equal to the size of 1 block.
   stride = blockDim.x;
   i = threadIdx.x;
   while (i < numBins) {
     localHisto[i] = 0;
     i += stride;
   }
-  //  if (myId < numBins) {
-  // localHisto[myId] = 0;
-  //}
   __syncthreads();
 
-  // Compute local histogram
+  // Compute local histogram. The vals array is shared among the
+  // threads of all blocks. To ensure all its elements are used exacty
+  // once and in case of an array greater that the number of threads,
+  // we use a stride equal to the number of all threads.
   stride = blockDim.x * gridDim.x;
   i = myId;
   while (i < numVals) {
@@ -107,16 +110,16 @@ void betterHisto(const unsigned int* const vals, //INPUT
   }
   __syncthreads();
 
-  // Merge histograms.
+  // Merge histograms. Again, the localHisto array is shared among the
+  // threads of 1 block. To ensure all its elements are incremented
+  // exacty once and in case of a histo bin greater that a block, we
+  // use a stride equal to the size of 1 block
   stride = blockDim.x;
   i = threadIdx.x;
   while (i < numBins) {
     atomicAdd (&(histo[i]), localHisto[i]);
     i += stride;
   }
-  //  if (myId < numBins) {
-  //  atomicAdd (&(histo[myId]), localHisto[myId]);
-  //}
 }
 
 void denseHisto (thrust::device_ptr<unsigned int> &d_vals,
