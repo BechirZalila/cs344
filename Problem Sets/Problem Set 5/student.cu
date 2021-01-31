@@ -33,6 +33,17 @@
 
 #include "utils.h"
 
+template<typename InputIterator>
+void printVector(const char * const msg,
+		 InputIterator begin,
+		 InputIterator end)
+{
+  std::cout << msg << "  ";
+  thrust::copy(begin, end,
+	       std::ostream_iterator<unsigned int>(std::cout, " "));
+  std::cout << std::endl;
+}
+
 // Very Simple Histo
 __global__
 void yourHisto(const unsigned int* const vals, //INPUT
@@ -56,7 +67,7 @@ void yourHisto(const unsigned int* const vals, //INPUT
     __syncthreads();
   
   if (myId == 0) {
-    printVector ("Simple Histo: ", histo, histo + numBins);
+    printVector ("Simple Histo: ", histo, histo + 1024);
   }
 }
 
@@ -102,17 +113,6 @@ void betterHisto(const unsigned int* const vals, //INPUT
   if (myId == 0) {
     printVector ("Better Histo: ", histo, histo + numBins);
   }
-}
-
-template<typename InputIterator>
-void printVector(const char * const msg,
-		 InputIterator begin,
-		 InputIterator end)
-{
-  std::cout << msg << "  ";
-  thrust::copy(begin, end,
-	       std::ostream_iterator<unsigned int>(std::cout, " "));
-  std::cout << std::endl;
 }
 
 void denseHisto (thrust::device_ptr<unsigned int> &d_vals,
