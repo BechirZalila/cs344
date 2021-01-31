@@ -79,8 +79,6 @@ void betterHisto(const unsigned int* const vals, //INPUT
   //feel free to use more if it will help you
   //write faster code
 
-  assert (numVals >= numBins);
-  
   int myId = threadIdx.x + blockDim.x * blockIdx.x;
   extern __shared__ unsigned int localHisto[]; // Allocated on kernel invocation
 
@@ -88,10 +86,9 @@ void betterHisto(const unsigned int* const vals, //INPUT
     return;
 
   // Reset local histo.
-  localHisto[threadIdx.x] = 0;
-  //  if (myId < numBins) {
-  //    localHisto[myId] = 0;
-  //  }
+  if (myId < numBins) {
+    localHisto[myId] = 0;
+  }
   __syncthreads();
 
   // Compute local histogram
@@ -104,10 +101,9 @@ void betterHisto(const unsigned int* const vals, //INPUT
   __syncthreads();
 
   // Merge histograms. Same mechanism as above:
-  atomicAdd (&(histo[threadIdx.x]), localHisto[threadIdx.x]);
-  //  if (myId < numBins) {
-  //    atomicAdd (&(histo[myId]), localHisto[myId]);
-  //  }
+  if (myId < numBins) {
+    atomicAdd (&(histo[myId]), localHisto[myId]);
+  }
 }
 
 void denseHisto (thrust::device_ptr<unsigned int> &d_vals,
