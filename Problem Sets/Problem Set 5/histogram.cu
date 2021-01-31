@@ -150,8 +150,7 @@ void sparse_histogram(const Vector1& input,
   print_vector("histogram counts", histogram_counts);
 
   thrust::scatter (histogram_counts.begin(), histogram_counts.end(),
-		   histo_values.begin(),
-		   dense_histo.begin());
+		   histogram_values.begin(), dense_histo.begin());
   print_vector ("dense histo", dense_histo);
 }
 
