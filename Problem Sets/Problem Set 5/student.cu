@@ -86,9 +86,10 @@ void betterHisto(const unsigned int* const vals, //INPUT
     return;
 
   // Reset local histo.
-  if (myId < numBins) {
-    localHisto[myId] = 0;
-  }
+  localHisto[threadIdx.x] = 0;
+  //  if (myId < numBins) {
+  //    localHisto[myId] = 0;
+  //  }
   __syncthreads();
 
   // Compute local histogram
@@ -101,9 +102,10 @@ void betterHisto(const unsigned int* const vals, //INPUT
   __syncthreads();
 
   // Merge histograms. Same mechanism as above:
-  if (myId < numBins) {
-    atomicAdd (&(histo[myId]), localHisto[myId]);
-  }
+  atomicAdd (&(histo[threadIdx.x]), localHisto[threadIdx.x]);
+  //  if (myId < numBins) {
+  //    atomicAdd (&(histo[myId]), localHisto[myId]);
+  //  }
 }
 
 void denseHisto (thrust::device_ptr<unsigned int> &d_vals,
