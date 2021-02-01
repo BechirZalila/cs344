@@ -518,17 +518,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     blendedValsBlue_2 = temp;
   }
 
-  // Final swap
-  temp = blendedValsRed_1;
-  blendedValsRed_1 = blendedValsRed_2;
-  blendedValsRed_2 = temp;
-  temp = blendedValsGreen_1;
-  blendedValsGreen_1 = blendedValsGreen_2;
-  blendedValsGreen_2 = temp;
-  temp = blendedValsBlue_1;
-  blendedValsBlue_1 = blendedValsBlue_2;
-  blendedValsBlue_2 = temp;
-
+  // No need for the final swap as in the reference computation. We
+  // just use the _1 variables instead of the _2 ones.
+  
   //Blending Kernel
   blend_kernel<<<grid_size,block_size>>>
     (d_blendedImg,strictInteriorPixels,
