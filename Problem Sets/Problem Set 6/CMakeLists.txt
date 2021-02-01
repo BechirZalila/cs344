@@ -19,5 +19,5 @@ file( GLOB cu *.cu )
 SET (HW6_files main.cpp loadSaveImage.cpp reference_calc.cpp compare.cpp)
 
 add_executable(HW6 ${HW6_files} ${hdr} ${cu})
-target_link_libraries(HW5 ${OpenCV_LIBS})
+target_link_libraries(HW6 ${OpenCV_LIBS})
 
