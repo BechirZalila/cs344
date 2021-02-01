@@ -475,6 +475,8 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 
   //Launching the iterations
   const size_t numIterations = 800;
+  float *temp; // For swapping
+  
   for(int i=0;i<numIterations;i++){
     computeIteration<<<grid_size,block_size>>>
       (red_dst, strictInteriorPixels, borderPixels,
@@ -483,7 +485,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
     // Swap
-    float* temp = blendedValsRed_1;
+    temp = blendedValsRed_1;
     blendedValsRed_1 = blendedValsRed_2;
     blendedValsRed_2 = temp;
   }
@@ -497,7 +499,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 
     // Swap
 
-    float* temp = blendedValsGreen_1;
+    temp = blendedValsGreen_1;
     blendedValsGreen_1 = blendedValsGreen_2;
     blendedValsGreen_2 = temp;
   }
@@ -511,10 +513,21 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 
     // Swap
 
-    float* temp = blendedValsBlue_1;
+    temp = blendedValsBlue_1;
     blendedValsBlue_1 = blendedValsBlue_2;
     blendedValsBlue_2 = temp;
   }
+
+  // Final swap
+  temp = blendedValsRed_1;
+  blendedValsRed_1 = blendedValsRed_2;
+  blendedValsRed_2 = temp;
+  temp = blendedValsGreen_1;
+  blendedValsGreen_1 = blendedValsGreen_2;
+  blendedValsGreen_2 = temp;
+  temp = blendedValsBlue_1;
+  blendedValsBlue_1 = blendedValsBlue_2;
+  blendedValsBlue_2 = temp;
 
   //Blending Kernel
   blend_kernel<<<grid_size,block_size>>>
