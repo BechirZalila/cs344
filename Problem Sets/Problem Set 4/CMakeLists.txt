@@ -8,7 +8,11 @@ cmake_minimum_required(VERSION 2.8)
 
 find_package(CUDA QUIET REQUIRED)
 find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
+
+enable_language(CUDA)
+# Necessary to use add_executable instead of deprecated CUDA_ADD_EXECUTABLE
+
+include_directories(${OpenCV_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
 
 # collect source files
 
@@ -16,5 +20,5 @@ file( GLOB  hdr *.hpp *.h )
 file( GLOB  cu  *.cu)
 SET (HW4_files main.cpp loadSaveImage.cpp reference_calc.cpp compare.cpp)
 
-CUDA_ADD_EXECUTABLE(HW4 ${HW4_files} ${hdr} ${img} ${cu})
+add_executable(HW4 ${HW4_files} ${hdr} ${img} ${cu})
 target_link_libraries(HW4 ${OpenCV_LIBS})

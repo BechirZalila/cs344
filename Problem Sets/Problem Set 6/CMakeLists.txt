@@ -7,8 +7,11 @@
 cmake_minimum_required(VERSION 2.8)
 
 find_package(CUDA QUIET REQUIRED)
-enable_language(CUDA)
 find_package(OpenCV REQUIRED)
+
+enable_language(CUDA)
+# Necessary to use add_executable instead of deprecated CUDA_ADD_EXECUTABLE
+
 include_directories(${OpenCV_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
 
 # collect source files
