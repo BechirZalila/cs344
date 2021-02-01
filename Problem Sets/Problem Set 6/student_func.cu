@@ -48,16 +48,16 @@
 
    Follow these steps to implement one iteration:
 
-   1) For every pixel p in the interior, compute two sums over the four neighboring pixels:
+   1) For every pixel p in the interior, compute two sums over the
+   four neighboring pixels:
       Sum1: If the neighbor is in the interior then += ImageGuess_prev[neighbor]
-             else if the neighbor in on the border then += DestinationImg[neighbor]
+        else if the neighbor in on the border then += DestinationImg[neighbor]
 
       Sum2: += SourceImg[p] - SourceImg[neighbor]   (for all four neighbors)
 
    2) Calculate the new pixel value:
       float newVal= (Sum1 + Sum2) / 4.f  <------ Notice that the result is FLOATING POINT
       ImageGuess_next[p] = min(255, max(0, newVal)); //clamp to [0, 255]
-
 
     In this assignment we will do 800 iterations.
    */
