@@ -102,9 +102,12 @@ int main(int argc, char **argv) {
 
   // calculate the reference image
   uchar4* h_reference = new uchar4[numRowsSource*numColsSource];
+  timer.Start();
   reference_calc(h_sourceImg, numRowsSource, numColsSource,
                    h_destImg, h_reference);
-
+  timer.Stop();
+  printf("Ref. code ran in: %f msecs.\n", timer.Elapsed());
+  
   // save the reference image
   postProcess(h_reference, numRowsSource, numColsSource, reference_file);
 
