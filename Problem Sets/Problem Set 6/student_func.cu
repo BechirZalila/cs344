@@ -474,7 +474,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());  
 
   //Launching the iterations
-  const size_t numIterations = 8000;
+  const size_t numIterations = 800;
   float *temp; // For swapping
   
   for(int i=0;i<numIterations;i++){
