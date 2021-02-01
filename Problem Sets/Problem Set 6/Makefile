@@ -32,7 +32,7 @@ CUDA_INCLUDEPATH=/usr/local/cuda-10.1/include
 #no warnings otherwise thrust explodes output
 
 NVCC_OPTS=-O3 -arch=sm_75 -Xcompiler -Wall -Xcompiler -Wextra -m64
-GCC_OPTS=-O3 Wall -Wextra -m64
+GCC_OPTS=-O3 -Wall -Wextra -m64
 
 student: main.o student_func.o HW6.o loadSaveImage.o compare.o reference_calc.o Makefile
 	$(NVCC) -o HW6 main.o student_func.o HW6.o loadSaveImage.o compare.o reference_calc.o -L $(OPENCV_LIBPATH) $(OPENCV_LIBS) $(NVCC_OPTS)
