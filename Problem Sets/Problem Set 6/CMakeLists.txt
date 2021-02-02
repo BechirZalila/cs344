@@ -21,7 +21,7 @@ file( GLOB cu *.cu )
 
 SET (HW6_files main.cpp loadSaveImage.cpp reference_calc.cpp compare.cpp)
 
-set(CUDA_CUDA_FLAGS "-gencode arch=compute_75,code=sm_75 -rdc=true")
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -rdc=true;-gencode=arch=compute_75,code=sm_75)
 
 add_executable(HW6 ${HW6_files} ${hdr} ${cu})
 # target_compile_options(HW6 PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
