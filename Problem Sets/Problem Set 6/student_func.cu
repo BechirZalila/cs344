@@ -675,7 +675,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   checkCudaErrors
     (cudaMemcpy
      (h_blendedValsRed,
-      blendedValsRed_2,
+      blendedValsRed_1,
       numRowsSource * numColsSource * sizeof(float),
       cudaMemcpyDeviceToHost));
   checkCudaErrors
