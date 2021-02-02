@@ -586,7 +586,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     (red_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsRed_1, g_red,
      blendedValsRed_2, numIterations);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Swap
   temp = blendedValsRed_1;
