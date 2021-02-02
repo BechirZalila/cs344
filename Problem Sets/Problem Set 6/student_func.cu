@@ -354,6 +354,8 @@ void computeAllIterations(unsigned char* dstImg,
     temp = old_f;
     old_f = new_f;
     new_f = temp;
+
+    __syncthreads();
     
   }
 
