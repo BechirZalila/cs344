@@ -321,6 +321,8 @@ void computeAllIterations(unsigned char* dstImg,
   if(!(strictInteriorPixels[offset]==1))
     return;
 
+  grid_group g = this_grid();
+
   for (int i = 0; i < numIterations; i++) {
     // Swap the buffers
     temp = old_f; old_f = new_f; new_f = temp;
@@ -366,14 +368,17 @@ void computeAllIterations(unsigned char* dstImg,
 
     new_f [offset] = fmin(255.f, fmax(0.f, f_next_val)); //clip to [0, 255]
 
-    // Wait for the output buffer to be entirely computed
+    // Wait for the output buffer to be entirely computed.
+
+    // FIXME: this is definitely wrong since __syncthreads only
+    // syncronizes threads within the same block.
+    
     __syncthreads();
   }
 
   // Set final output buffer. Since we do the swap at the end of the
   // loop. The newest buffer is stored in old_f
   f_next [offset] = new_f [offset];
-  //__syncthreads();
 
 }
 
