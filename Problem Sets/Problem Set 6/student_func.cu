@@ -610,6 +610,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //   blendedValsBlue_2 = temp;
   // }
 
+  // No need for the final swap as in the reference computation. We
+  // just use the _1 variables instead of the _2 ones.
+  
   computeAllIterations<<<grid_size, block_size, 0, s1>>>
     (red_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsRed_1, g_red,
@@ -629,27 +632,12 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
-  // Swap
-  temp = blendedValsRed_1;
-  blendedValsRed_1 = blendedValsRed_2;
-  blendedValsRed_2 = temp;
-
-  temp = blendedValsGreen_1;
-  blendedValsGreen_1 = blendedValsGreen_2;
-  blendedValsGreen_2 = temp;
-    
-  temp = blendedValsBlue_1;
-  blendedValsBlue_1 = blendedValsBlue_2;
-  blendedValsBlue_2 = temp;
-
-  // No need for the final swap as in the reference computation. We
-  // just use the _1 variables instead of the _2 ones.
-  
   //Blending Kernel
   blend_kernel<<<grid_size,block_size>>>
     (d_blendedImg,strictInteriorPixels,
      numRowsSource,numColsSource,
-     blendedValsRed_1,blendedValsGreen_1,blendedValsBlue_1);
+     blendedValsRed_2, blendedValsGreen_2, blendedValsBlue_2);
+  // blendedValsRed_1, blendedValsGreen_1, blendedValsBlue_1);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   //Finally Copy back the destination image from the device to the host
