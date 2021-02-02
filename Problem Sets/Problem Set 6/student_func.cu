@@ -274,7 +274,9 @@ void computeIteration(unsigned char* dstImg,
 }
 
 // Compute all iterations in one kernel. necessary to parallelize the
-// handling of R, G and B
+// handling of R, G and B. We cannot use shared memory to speed up the
+// computation since the size of the input buffer is far larger than
+// the maximum shared memory size per block.
 __global__
 void computeAllIterations(unsigned char* dstImg,
 			  unsigned char* strictInteriorPixels,
@@ -297,25 +299,14 @@ void computeAllIterations(unsigned char* dstImg,
   
   int offset = x*numColsSource+y;
   
-  extern __shared__ float doubleBuffer[]; // Allocated on kernel
-					  // call. The size of this
-					  // buffer is double the size of f
-  int pout = 0, pin = 1; // Will be swapped at each iteration to ping
-			 // pong in and out buffers.
-
-  // Load input f into shared memory
-  doubleBuffer [offset] = f [offset];
-  __syncthreads();
+  float *old_f = f;
+  float *new_f = f_next;
+  float *temp; // for swapping
 
   if(!(strictInteriorPixels[offset]==1))
     return;
 
   for (int i = 0; i < numIterations; i++) {
-    pout = 1 - pout; pin = 1 - pin; // Switch input and output
-
-    printf ("%d : %d : %d : %d\n",
-	    n, offset, pin*n + offset, pout * n + offset);
-
     // Reset the sums
     blendedSum = 0.f;
     borderSum  = 0.f;
@@ -325,28 +316,28 @@ void computeAllIterations(unsigned char* dstImg,
     //border pixel then we add the value of the destination image at
     //the border.  These border values are our boundary conditions.
     if (strictInteriorPixels[offset - 1]) {
-      blendedSum += doubleBuffer [pin*n + offset - 1];
+      blendedSum += old_f [offset - 1];
     }
     else {
       borderSum += dstImg[offset - 1];
     }
     
     if (strictInteriorPixels[offset + 1]) {
-      blendedSum += doubleBuffer [pin * n + offset + 1];
+      blendedSum += old_f [offset + 1];
     }
     else {
       borderSum += dstImg[offset + 1];
     }
     
     if (strictInteriorPixels[offset - numColsSource]) {
-      blendedSum += doubleBuffer [pin * n + offset - numColsSource];
+      blendedSum += old_f [offset - numColsSource];
     }
     else {
       borderSum += dstImg[offset - numColsSource];
     }
     
     if (strictInteriorPixels[offset + numColsSource]) {
-      blendedSum += doubleBuffer [pin * n + offset + numColsSource];
+      blendedSum += old_f [offset + numColsSource];
     }
     else {
       borderSum += dstImg[offset + numColsSource];
@@ -354,15 +345,22 @@ void computeAllIterations(unsigned char* dstImg,
     
     float f_next_val = (blendedSum + borderSum + g[offset]) / 4.f;
     
-    doubleBuffer [pout * n + offset] = fmin(255.f, fmax(0.f, f_next_val));
+    new_f [offset] = fmin(255.f, fmax(0.f, f_next_val));
     //clip to [0, 255]
 
     // Wait for the output buffer to be entirely computed
-    __syncthreads();    
+    __syncthreads();
+
+    // Swap the buffers
+    temp = old_f;
+    old_f = new_f;
+    new_f = temp;
+    
   }
 
-  // Set final output buffer
-  f_next [offset] = doubleBuffer [pout * n + offset];
+  // Set final output buffer. SInce we have done a swap at the end of
+  // the loop. The newest buffer is stored in old_f
+  f_next [offset] = old_f [offset];
 }
 
 __global__
