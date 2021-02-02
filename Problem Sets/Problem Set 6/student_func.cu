@@ -370,7 +370,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   unsigned char *borderPixels;
   unsigned char *strictInteriorPixels;
 
-  // g term
+  // G term
   float *g_red;   
   float *g_green; 
   float *g_blue;
@@ -407,6 +407,15 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   checkCudaErrors(cudaMalloc(&blendedValsBlue_2, srcSize*sizeof(float)));
   checkCudaErrors(cudaMalloc(&blendedValsGreen_1, srcSize*sizeof(float)));
   checkCudaErrors(cudaMalloc(&blendedValsGreen_2, srcSize*sizeof(float)));
+
+  // CUDA Stream to parallelize independent kernels. We need at most 3
+  // streams
+
+  cudaStream_t s1, s2, s3;
+
+  cudaStreamCreate (&s1);
+  cudaStreamCreate (&s2);
+  cudaStreamCreate (&s3);
 
   //Copying Source, Destination and Blended Images on the GPU
   checkCudaErrors
@@ -546,4 +555,8 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   checkCudaErrors(cudaFree(blue_dst));
   checkCudaErrors(cudaFree(borderPixels));
   checkCudaErrors(cudaFree(strictInteriorPixels));
+
+  cudaStreamDestroy (s1);
+  cudaStreamDestroy (s2);
+  cudaStreamDestroy (s3);
 }
