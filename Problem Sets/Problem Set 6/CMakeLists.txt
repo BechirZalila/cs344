@@ -25,13 +25,7 @@ add_executable(HW6 ${HW6_files} ${hdr} ${cu})
 target_compile_options(HW6 PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
   --generate-line-info
   --use_fast_math
-  -O3
-  -arch=sm_75
   -rdc=true
-  -Xcompiler
-  -Wall
-  -Xcompiler
-  -m64
   >)
 target_link_libraries(HW6 ${OpenCV_LIBS})
 
