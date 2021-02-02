@@ -507,32 +507,32 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //Copying Source, Destination and Blended Images on the GPU
   checkCudaErrors
     (cudaMemcpyAsync
-     (d_sourceImg,h_sourceImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice, s1));
+     (d_sourceImg,h_sourceImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice));
   checkCudaErrors
     (cudaMemcpyAsync
-     (d_destImg,h_destImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice, s2));
+     (d_destImg,h_destImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice));
 
   //Copying Destination Image to the Blended Image
   checkCudaErrors
     (cudaMemcpyAsync
-     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice, s3));
+     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice));
 
   // Split the source and destination images into their respective channels
-  separateChannels<<<grid_size,block_size, 0, s1>>>
+  separateChannels<<<grid_size,block_size>>>
     (d_sourceImg,numRowsSource,numColsSource,red_src,green_src,blue_src);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  separateChannels<<<grid_size,block_size, 0, s2>>>
+  separateChannels<<<grid_size,block_size>>>
     (d_destImg,numRowsSource,numColsSource,red_dst,green_dst,blue_dst);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
   // Create mask
-  mask_kernel<<<grid_size,block_size, 0, s1>>>
+  mask_kernel<<<grid_size,block_size>>>
     (mask, numRowsSource, numColsSource, red_src, green_src, blue_src);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Compute the strictly interior and border pixels
-  interior_and_border_pixels<<<grid_size,block_size, 0, s1>>>
+  interior_and_border_pixels<<<grid_size,block_size>>>
     (mask, numRowsSource, numColsSource, borderPixels, strictInteriorPixels);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
@@ -548,18 +548,18 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   checkCudaErrors(cudaMemset(g_blue, 0, srcSize * sizeof(float)));
 
   //Launch Kernels
-  computeG_kernel<<<grid_size,block_size, 0, s1>>>
+  computeG_kernel<<<grid_size,block_size>>>
     (red_src,g_red,numRowsSource,numColsSource,strictInteriorPixels);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeG_kernel<<<grid_size,block_size, 0, s2>>>
+  computeG_kernel<<<grid_size,block_size>>>
     (green_src,g_green,numRowsSource,numColsSource,strictInteriorPixels);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeG_kernel<<<grid_size,block_size, 0, s3>>>
+  computeG_kernel<<<grid_size,block_size>>>
     (blue_src,g_blue,numRowsSource,numColsSource,strictInteriorPixels);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Launch Copy Kernel for blended image buffers
-  copy_kernel<<<grid_size,block_size, 0, s4>>>
+  copy_kernel<<<grid_size,block_size>>>
     (red_src,green_src,blue_src,
      numRowsSource,numColsSource,
      blendedValsRed_1,blendedValsGreen_1,blendedValsBlue_1,
