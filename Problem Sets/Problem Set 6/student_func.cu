@@ -693,7 +693,8 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     }
   }
   printf ("\n");
-  free (blendedValsRed);
+  free (h_blendedValsRed);
+  free (h_strictInteriorPixels);
   
   //Blending Kernel
   blend_kernel<<<grid_size,block_size>>>
