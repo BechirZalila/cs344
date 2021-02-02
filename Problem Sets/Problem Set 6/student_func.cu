@@ -520,21 +520,21 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // Split the source and destination images into their respective channels
   separateChannels<<<grid_size,block_size, 0, s1>>>
     (d_sourceImg,numRowsSource,numColsSource,red_src,green_src,blue_src);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   separateChannels<<<grid_size,block_size, 0, s2>>>
     (d_destImg,numRowsSource,numColsSource,red_dst,green_dst,blue_dst);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
   // Create mask
   mask_kernel<<<grid_size,block_size, 0, s1>>>
     (mask, numRowsSource, numColsSource, red_src, green_src, blue_src);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Compute the strictly interior and border pixels
   interior_and_border_pixels<<<grid_size,block_size, 0, s1>>>
     (mask, numRowsSource, numColsSource, borderPixels, strictInteriorPixels);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Wait for all stream to be done
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
