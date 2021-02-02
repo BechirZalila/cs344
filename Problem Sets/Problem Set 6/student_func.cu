@@ -373,8 +373,8 @@ void computeAllIterations(unsigned char* dstImg,
 
     // FIXME: this is definitely wrong since __syncthreads only
     // syncronizes threads within the same block.
-    
-    __syncthreads();
+    g.sync();
+    //__syncthreads();
   }
 
   // Set final output buffer. Since we do the swap at the end of the
