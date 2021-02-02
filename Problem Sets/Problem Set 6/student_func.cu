@@ -513,10 +513,10 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     (cudaMemcpyAsync
      (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice, s2));
 
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
   // Split the source and destination images into their respective channels
-  separateChannels<<<grid_size,block_size>>>
+  separateChannels<<<grid_size,block_size, 0, s1>>>
     (d_sourceImg,numRowsSource,numColsSource,red_src,green_src,blue_src);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
