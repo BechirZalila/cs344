@@ -22,10 +22,10 @@ file( GLOB cu *.cu )
 SET (HW6_files main.cpp loadSaveImage.cpp reference_calc.cpp compare.cpp)
 
 add_executable(HW6 ${HW6_files} ${hdr} ${cu})
-set_property(TARGET HW6 PROPERTY CUDA_ARCHITECTURES 75)
 target_compile_options(HW6 PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
   --generate-line-info
   --use_fast_math
+  -gencode arch=compute_75,code=sm_75
   -rdc=true
   >)
 target_link_libraries(HW6 ${OpenCV_LIBS})
