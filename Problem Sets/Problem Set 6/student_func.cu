@@ -593,9 +593,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Swap
-  //temp = blendedValsRed_1;
-  //blendedValsRed_1 = blendedValsRed_2;
-  //blendedValsRed_2 = temp;
+  temp = blendedValsRed_1;
+  blendedValsRed_1 = blendedValsRed_2;
+  blendedValsRed_2 = temp;
   
   for(int i=0;i<numIterations;i++){
     computeIteration<<<grid_size,block_size>>>
