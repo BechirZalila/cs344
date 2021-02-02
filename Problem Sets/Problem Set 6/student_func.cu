@@ -419,35 +419,37 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 
   //Copying Source, Destination and Blended Images on the GPU
   checkCudaErrors
-    (cudaMemcpy
-     (d_sourceImg,h_sourceImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice));
+    (cudaMemcpyAsync
+     (d_sourceImg,h_sourceImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice, s1));
   checkCudaErrors
-    (cudaMemcpy
-     (d_destImg,h_destImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice));
+    (cudaMemcpyAsync
+     (d_destImg,h_destImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice, s2));
 
   //Copying Destination Image to the Blended Image
   checkCudaErrors
-    (cudaMemcpy
-     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice));
+    (cudaMemcpyAsync
+     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice, s3));
 
   // Split the source and destination images into their respective channels
-  separateChannels<<<grid_size,block_size>>>
+  separateChannels<<<grid_size,block_size, s1>>>
     (d_sourceImg,numRowsSource,numColsSource,red_src,green_src,blue_src);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  separateChannels<<<grid_size,block_size>>>
+  separateChannels<<<grid_size,block_size, s2>>>
     (d_destImg,numRowsSource,numColsSource,red_dst,green_dst,blue_dst);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
   // Create mask
-  mask_kernel<<<grid_size,block_size>>>
+  mask_kernel<<<grid_size,block_size, s1>>>
     (mask, numRowsSource, numColsSource, red_src, green_src, blue_src);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Compute the strictly interior and border pixels
-  interior_and_border_pixels<<<grid_size,block_size>>>
-    (mask, numRowsSource, numColsSource, borderPixels,strictInteriorPixels);
+  interior_and_border_pixels<<<grid_size,block_size, s1>>>
+    (mask, numRowsSource, numColsSource, borderPixels, strictInteriorPixels);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  // Wait for all stream to be done
 
   // Next we'll precompute the g term - it never changes, no need to
   // recompute every iteration
