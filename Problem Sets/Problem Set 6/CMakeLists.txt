@@ -21,7 +21,8 @@ file( GLOB cu *.cu )
 
 SET (HW6_files main.cpp loadSaveImage.cpp reference_calc.cpp compare.cpp)
 
-target_compile_options(target PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
+add_executable(HW6 ${HW6_files} ${hdr} ${cu})
+target_compile_options(HW6 PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
   --generate-line-info
   --use_fast_math
   -O3
@@ -33,7 +34,5 @@ target_compile_options(target PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
   -Wextra
   -m64
   >)
-
-add_executable(HW6 ${HW6_files} ${hdr} ${cu})
 target_link_libraries(HW6 ${OpenCV_LIBS})
 
