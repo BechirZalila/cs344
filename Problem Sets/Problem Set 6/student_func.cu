@@ -290,8 +290,7 @@ void computeAllIterations(unsigned char* dstImg,
 {
   int x = threadIdx.x + blockDim.x * blockIdx.x;
   int y = threadIdx.y + blockDim.y * blockIdx.y;
-  int n = numRowsSource * numColsSource;
-  float blendedSum;
+    float blendedSum;
   float borderSum;
   
   if(x>=numRowsSource || y>=numColsSource )
