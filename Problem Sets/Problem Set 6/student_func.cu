@@ -581,44 +581,63 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //   blendedValsRed_1 = blendedValsRed_2;
   //   blendedValsRed_2 = temp;
   // }
+  
+  // for(int i=0;i<numIterations;i++){
+  //   computeIteration<<<grid_size,block_size>>>
+  //     (green_dst, strictInteriorPixels, borderPixels,
+  //      numRowsSource, numColsSource, blendedValsGreen_1, g_green,
+  //      blendedValsGreen_2);
+  //   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  //   // Swap
+
+  //   temp = blendedValsGreen_1;
+  //   blendedValsGreen_1 = blendedValsGreen_2;
+  //   blendedValsGreen_2 = temp;
+  // }
+  
+  // for(int i=0;i<numIterations;i++){
+  //   computeIteration<<<grid_size,block_size>>>
+  //     (blue_dst, strictInteriorPixels, borderPixels,
+  //      numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
+  //      blendedValsBlue_2);
+  //   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  //   // Swap
+
+  //   temp = blendedValsBlue_1;
+  //   blendedValsBlue_1 = blendedValsBlue_2;
+  //   blendedValsBlue_2 = temp;
+  // }
+
   computeAllIterations<<<grid_size, block_size>>>
     (red_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsRed_1, g_red,
      blendedValsRed_2, numIterations);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-
+  computeAllIterations<<<grid_size,block_size>>>
+    (green_dst, strictInteriorPixels, borderPixels,
+     numRowsSource, numColsSource, blendedValsGreen_1, g_green,
+     blendedValsGreen_2, numIterations);
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  computeAllIterations<<<grid_size,block_size>>>
+    (blue_dst, strictInteriorPixels, borderPixels,
+     numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
+     blendedValsBlue_2, numIterations);
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  
   // Swap
   temp = blendedValsRed_1;
   blendedValsRed_1 = blendedValsRed_2;
   blendedValsRed_2 = temp;
-  
-  for(int i=0;i<numIterations;i++){
-    computeIteration<<<grid_size,block_size>>>
-      (green_dst, strictInteriorPixels, borderPixels,
-       numRowsSource, numColsSource, blendedValsGreen_1, g_green,
-       blendedValsGreen_2);
-    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-    // Swap
-
-    temp = blendedValsGreen_1;
-    blendedValsGreen_1 = blendedValsGreen_2;
-    blendedValsGreen_2 = temp;
-  }
-  
-  for(int i=0;i<numIterations;i++){
-    computeIteration<<<grid_size,block_size>>>
-      (blue_dst, strictInteriorPixels, borderPixels,
-       numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
-       blendedValsBlue_2);
-    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-
-    // Swap
-
-    temp = blendedValsBlue_1;
-    blendedValsBlue_1 = blendedValsBlue_2;
-    blendedValsBlue_2 = temp;
-  }
+  temp = blendedValsGreen_1;
+  blendedValsGreen_1 = blendedValsGreen_2;
+  blendedValsGreen_2 = temp;
+    
+  temp = blendedValsBlue_1;
+  blendedValsBlue_1 = blendedValsBlue_2;
+  blendedValsBlue_2 = temp;
 
   // No need for the final swap as in the reference computation. We
   // just use the _1 variables instead of the _2 ones.
