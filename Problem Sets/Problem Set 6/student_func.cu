@@ -349,14 +349,64 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   dim3 block_size(32,32,1);
   dim3 grid_size((numRowsSource+32-1)/32, (numColsSource+32-1)/32, 1);
   
-  //Allocate Memories for Source, Destination and Blended images on GPU
+  // Source, Destination and Blended images on GPU
   uchar4* d_sourceImg;
   uchar4* d_destImg;
   uchar4* d_blendedImg;
 
+  // Color channels for the source and destination images
+  unsigned char* red_src;  
+  unsigned char* green_src;
+  unsigned char* blue_src;
+  
+  unsigned char* red_dst;    
+  unsigned char* green_dst; 
+  unsigned char* blue_dst;
+
+  // Mask
+  unsigned char* mask;
+
+  // Strictly interior pixels and border pixels
+  unsigned char *borderPixels;
+  unsigned char *strictInteriorPixels;
+
+  // g term
+  float *g_red;   
+  float *g_green; 
+  float *g_blue;
+
+  // Double buffer for each color
+  float *blendedValsRed_1;
+  float *blendedValsRed_2;
+
+  float *blendedValsBlue_1;
+  float *blendedValsBlue_2;
+
+  float *blendedValsGreen_1;
+  float *blendedValsGreen_2;
+
+  //Allocate Memories on GPU
   checkCudaErrors(cudaMalloc(&d_sourceImg, srcSize*sizeof(uchar4)));
   checkCudaErrors(cudaMalloc(&d_destImg, srcSize*sizeof(uchar4)));
   checkCudaErrors(cudaMalloc(&d_blendedImg, srcSize*sizeof(uchar4)));
+  checkCudaErrors(cudaMalloc(&red_src, srcSize*sizeof(unsigned char)));  
+  checkCudaErrors(cudaMalloc(&green_src, srcSize*sizeof(unsigned char)));
+  checkCudaErrors(cudaMalloc(&blue_src, srcSize*sizeof(unsigned char)));
+  checkCudaErrors(cudaMalloc(&red_dst, srcSize*sizeof(unsigned char)));  
+  checkCudaErrors(cudaMalloc(&green_dst, srcSize*sizeof(unsigned char)));
+  checkCudaErrors(cudaMalloc(&blue_dst, srcSize*sizeof(unsigned char)));
+  checkCudaErrors(cudaMalloc(&mask, srcSize*sizeof(unsigned char)));
+  checkCudaErrors(cudaMalloc(&borderPixels, srcSize*sizeof(unsigned char)));
+  checkCudaErrors(cudaMalloc(&strictInteriorPixels, srcSize*sizeof(unsigned char)));
+  checkCudaErrors(cudaMalloc(&g_red, srcSize*sizeof(float)));  
+  checkCudaErrors(cudaMalloc(&g_green, srcSize*sizeof(float)));
+  checkCudaErrors(cudaMalloc(&g_blue, srcSize*sizeof(float)));
+  checkCudaErrors(cudaMalloc(&blendedValsRed_1, srcSize*sizeof(float)));
+  checkCudaErrors(cudaMalloc(&blendedValsRed_2, srcSize*sizeof(float)));
+  checkCudaErrors(cudaMalloc(&blendedValsBlue_1, srcSize*sizeof(float)));
+  checkCudaErrors(cudaMalloc(&blendedValsBlue_2, srcSize*sizeof(float)));
+  checkCudaErrors(cudaMalloc(&blendedValsGreen_1, srcSize*sizeof(float)));
+  checkCudaErrors(cudaMalloc(&blendedValsGreen_2, srcSize*sizeof(float)));
 
   //Copying Source, Destination and Blended Images on the GPU
   checkCudaErrors
@@ -371,23 +421,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     (cudaMemcpy
      (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice));
 
-  //split the source and destination images into their respective channels
-  unsigned char* red_src;  
-  unsigned char* green_src;
-  unsigned char* blue_src;
-  
-  unsigned char* red_dst;    
-  unsigned char* green_dst; 
-  unsigned char* blue_dst;
-
-  checkCudaErrors(cudaMalloc(&red_src, srcSize*sizeof(unsigned char)));  
-  checkCudaErrors(cudaMalloc(&green_src, srcSize*sizeof(unsigned char)));
-  checkCudaErrors(cudaMalloc(&blue_src, srcSize*sizeof(unsigned char)));
-  checkCudaErrors(cudaMalloc(&red_dst, srcSize*sizeof(unsigned char)));  
-  checkCudaErrors(cudaMalloc(&green_dst, srcSize*sizeof(unsigned char)));
-  checkCudaErrors(cudaMalloc(&blue_dst, srcSize*sizeof(unsigned char)));
-
-  //Launching the kernels For separating channels
+  // Split the source and destination images into their respective channels
   separateChannels<<<grid_size,block_size>>>
     (d_sourceImg,numRowsSource,numColsSource,red_src,green_src,blue_src);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
@@ -396,38 +430,19 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     (d_destImg,numRowsSource,numColsSource,red_dst,green_dst,blue_dst);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
-  //Then create mask  
-  unsigned char* mask;
-  checkCudaErrors(cudaMalloc(&mask, srcSize*sizeof(unsigned char)));
-
-  //Launch the kernel
+  // Create mask
   mask_kernel<<<grid_size,block_size>>>
     (mask, numRowsSource, numColsSource, red_src, green_src, blue_src);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  //next compute strictly interior pixels and border pixels
-  unsigned char *borderPixels;
-  unsigned char *strictInteriorPixels;
-  checkCudaErrors
-    (cudaMalloc(&borderPixels, srcSize*sizeof(unsigned char)));
-  checkCudaErrors
-    (cudaMalloc(&strictInteriorPixels, srcSize*sizeof(unsigned char)));
-
-  //Launch the kernel
+  // Compute the strictly interior and border pixels
   interior_and_border_pixels<<<grid_size,block_size>>>
     (mask, numRowsSource, numColsSource, borderPixels,strictInteriorPixels);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  //next we'll precompute the g term - it never changes, no need to
-  //recompute every iteration
-  float *g_red;   
-  float *g_green; 
-  float *g_blue;
-
-  checkCudaErrors(cudaMalloc(&g_red, srcSize*sizeof(float)));  
-  checkCudaErrors(cudaMalloc(&g_green, srcSize*sizeof(float)));
-  checkCudaErrors(cudaMalloc(&g_blue, srcSize*sizeof(float)));
-
+  // Next we'll precompute the g term - it never changes, no need to
+  // recompute every iteration
+  
   //Initialize to 0
   checkCudaErrors(cudaMemset(g_red, 0, srcSize * sizeof(float)));
   checkCudaErrors(cudaMemset(g_green, 0, srcSize * sizeof(float)));
@@ -444,28 +459,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     (blue_src,g_blue,numRowsSource,numColsSource,strictInteriorPixels);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  //for each color channel we'll need two buffers and we'll ping-pong
-  //between them
-  float *blendedValsRed_1;
-  float *blendedValsRed_2;
-
-  float *blendedValsBlue_1;
-  float *blendedValsBlue_2;
-
-  float *blendedValsGreen_1;
-  float *blendedValsGreen_2;
-
-  //Allocating Memory on the GPU
-  checkCudaErrors(cudaMalloc(&blendedValsRed_1, srcSize*sizeof(float)));
-  checkCudaErrors(cudaMalloc(&blendedValsRed_2, srcSize*sizeof(float)));
-
-  checkCudaErrors(cudaMalloc(&blendedValsBlue_1, srcSize*sizeof(float)));
-  checkCudaErrors(cudaMalloc(&blendedValsBlue_2, srcSize*sizeof(float)));
-
-  checkCudaErrors(cudaMalloc(&blendedValsGreen_1, srcSize*sizeof(float)));
-  checkCudaErrors(cudaMalloc(&blendedValsGreen_2, srcSize*sizeof(float)));
-
-  //Launch Copy Kernel
+  // Launch Copy Kernel for blended image buffers
   copy_kernel<<<grid_size,block_size>>>
     (red_src,green_src,blue_src,
      numRowsSource,numColsSource,
