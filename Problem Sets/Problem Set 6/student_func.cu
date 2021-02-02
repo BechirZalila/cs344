@@ -298,8 +298,8 @@ void computeAllIterations(unsigned char* dstImg,
   
   int offset = x*numColsSource+y;
   
-  float *old_f = f_next;
-  float *new_f = f;
+  float *old_f = f;
+  float *new_f = f_next;
   float *temp; // for swapping
 
   if(!(strictInteriorPixels[offset]==1))
@@ -307,7 +307,7 @@ void computeAllIterations(unsigned char* dstImg,
 
   for (int i = 0; i < numIterations; i++) {
     // Swap the buffers
-    temp = old_f; old_f = new_f; new_f = temp;
+    //temp = old_f; old_f = new_f; new_f = temp;
     
     // Reset the sums
     blendedSum = 0.f;
@@ -317,36 +317,37 @@ void computeAllIterations(unsigned char* dstImg,
     // interior pixel then we add the previous f, otherwise if it is a
     // border pixel then we add the value of the destination image at
     // the border.  These border values are our boundary conditions.
+
     if (strictInteriorPixels[offset - 1]) {
       blendedSum += old_f [offset - 1];
     }
     else {
       borderSum += dstImg[offset - 1];
     }
-    
+
     if (strictInteriorPixels[offset + 1]) {
       blendedSum += old_f [offset + 1];
     }
     else {
       borderSum += dstImg[offset + 1];
     }
-    
+
     if (strictInteriorPixels[offset - numColsSource]) {
       blendedSum += old_f [offset - numColsSource];
     }
     else {
       borderSum += dstImg[offset - numColsSource];
     }
-    
+
     if (strictInteriorPixels[offset + numColsSource]) {
       blendedSum += old_f [offset + numColsSource];
     }
     else {
       borderSum += dstImg[offset + numColsSource];
     }
-    
+
     float f_next_val = (blendedSum + borderSum + g[offset]) / 4.f;
-    
+
     new_f [offset] = fmin(255.f, fmax(0.f, f_next_val));
     //clip to [0, 255]
 
@@ -590,9 +591,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Swap
-  //temp = blendedValsRed_1;
-  //blendedValsRed_1 = blendedValsRed_2;
-  //blendedValsRed_2 = temp;
+  temp = blendedValsRed_1;
+  blendedValsRed_1 = blendedValsRed_2;
+  blendedValsRed_2 = temp;
   
   for(int i=0;i<numIterations;i++){
     computeIteration<<<grid_size,block_size>>>
