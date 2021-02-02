@@ -357,7 +357,7 @@ void computeAllIterations(unsigned char* dstImg,
 
   // Set final output buffer. Since we do the swap at the end of the
   // loop. The newest buffer is stored in old_f
-  //f_next [offset] = old_f [offset];
+  f_next [offset] = new_f [offset];
   //__syncthreads();
 }
 
