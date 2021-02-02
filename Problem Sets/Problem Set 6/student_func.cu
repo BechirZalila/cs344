@@ -431,21 +431,21 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
      (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice, s3));
 
   // Split the source and destination images into their respective channels
-  separateChannels<<<grid_size,block_size, s1>>>
+  separateChannels<<<grid_size,block_size, 0, s1>>>
     (d_sourceImg,numRowsSource,numColsSource,red_src,green_src,blue_src);
   //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  separateChannels<<<grid_size,block_size, s2>>>
+  separateChannels<<<grid_size,block_size, 0, s2>>>
     (d_destImg,numRowsSource,numColsSource,red_dst,green_dst,blue_dst);
   //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
   // Create mask
-  mask_kernel<<<grid_size,block_size, s1>>>
+  mask_kernel<<<grid_size,block_size, 0, s1>>>
     (mask, numRowsSource, numColsSource, red_src, green_src, blue_src);
   //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Compute the strictly interior and border pixels
-  interior_and_border_pixels<<<grid_size,block_size, s1>>>
+  interior_and_border_pixels<<<grid_size,block_size, 0, s1>>>
     (mask, numRowsSource, numColsSource, borderPixels, strictInteriorPixels);
   //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
