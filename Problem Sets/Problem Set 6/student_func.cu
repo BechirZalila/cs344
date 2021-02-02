@@ -667,9 +667,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Debug
-  float *h_blendedValsRed = malloc
+  float *h_blendedValsRed = (float *) malloc
     (numRowsSource * numColsSource * sizeof(float));
-  float *h_strictInteriorPixels = malloc
+  float *h_strictInteriorPixels = (unsigned char *) malloc
     (numRowsSource * numColsSource * sizeof(unsigned char));
   
   checkCudaErrors
