@@ -544,18 +544,18 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   checkCudaErrors(cudaMemset(g_blue, 0, srcSize * sizeof(float)));
 
   //Launch Kernels
-  computeG_kernel<<<grid_size,block_size>>>
+  computeG_kernel<<<grid_size,block_size, 0, s1>>>
     (red_src,g_red,numRowsSource,numColsSource,strictInteriorPixels);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeG_kernel<<<grid_size,block_size>>>
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  computeG_kernel<<<grid_size,block_size, 0, s2>>>
     (green_src,g_green,numRowsSource,numColsSource,strictInteriorPixels);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeG_kernel<<<grid_size,block_size>>>
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  computeG_kernel<<<grid_size,block_size, 0, s3>>>
     (blue_src,g_blue,numRowsSource,numColsSource,strictInteriorPixels);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Launch Copy Kernel for blended image buffers
-  copy_kernel<<<grid_size,block_size>>>
+  copy_kernel<<<grid_size,block_size, 0, s4>>>
     (red_src,green_src,blue_src,
      numRowsSource,numColsSource,
      blendedValsRed_1,blendedValsGreen_1,blendedValsBlue_1,
