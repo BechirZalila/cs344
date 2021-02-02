@@ -679,15 +679,17 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     int numIterations;
   } params_t;
 
-  params_t param = {.dstImg = red_dst,
-		    .strictInteriorPixels = strictInteriorPixels,
-		    .borderPixels = borderPixels,
-		    .numRowsSource = numRowsSource,
-		    .numColsSource = numColsSource,
-		    .f = blendedValsRed_1,
-		    .g = g_red,
-		    .f_next = blendedValsRed_2,
-		    .numIterations = numIterations};
+  params_t param;
+
+  param.dstImg = red_dst;
+  param.strictInteriorPixels = strictInteriorPixels;
+  param.borderPixels = borderPixels;
+  param.numRowsSource = numRowsSource;
+  param.numColsSource = numColsSource;
+  param.f = blendedValsRed_1;
+  param.g = g_red;
+  param.f_next = blendedValsRed_2;
+  param.numIterations = numIterations;
   //void *kArgs = &param;
   
   //cudaLaunchCooperativeKernel
