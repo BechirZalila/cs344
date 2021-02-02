@@ -322,7 +322,7 @@ void computeAllIterations(unsigned char* dstImg,
   if(!(strictInteriorPixels[offset]==1))
     return;
 
-  grid_group grp = this_grid();
+  //grid_group grp = this_grid();
 
   for (int i = 0; i < numIterations; i++) {
     // Swap the buffers
