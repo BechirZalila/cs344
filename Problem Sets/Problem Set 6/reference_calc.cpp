@@ -231,9 +231,9 @@ void reference_calc(const uchar4* const h_sourceImg,
 
   // debug
   for (int j = 0; j < 100; j++) {
-    prinff ("%2.2f ", blendedValsRed_2[j]);
+    printf ("%2.2f ", blendedValsRed_2[j]);
   }
-  prinf ("\n");
+  printf ("\n");
 
   //wow, we allocated a lot of memory!
   delete[] mask;
