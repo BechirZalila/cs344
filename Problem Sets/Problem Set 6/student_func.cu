@@ -203,6 +203,26 @@ void copy_kernel(unsigned char* red_src,
   blendedValsGreen_2[i] = (float)green_src[i];
 }
 
+// Elementary copy kernel. Useful to parallelize streams
+__global__
+void elem_copy_kernel(unsigned char* col_src,
+		 int numRowsSource,
+		 int numColsSource,
+		 float* blendedValsCol_1,
+		 float* blendedValsCol_2)
+{
+  int x = threadIdx.x + blockDim.x * blockIdx.x;
+  int y = threadIdx.y + blockDim.y * blockIdx.y;
+  
+  if(x>=numRowsSource || y>=numColsSource )
+    return;
+  
+  int i = x*numColsSource+y;
+  
+  blendedValsCol_1[i] = (float)col_src[i];
+  blendedValsCol_2[i] = (float)col_src[i];
+}
+
 // Performs 1 of the 800 iterations of the solver
 __global__
 void computeIteration(unsigned char* dstImg,
