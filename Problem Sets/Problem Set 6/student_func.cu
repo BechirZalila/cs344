@@ -207,7 +207,6 @@ void copy_kernel(unsigned char* red_src,
   blendedValsGreen_2[i] = (float)green_src[i];
 }
 
-
 //Performs 1 of the 800 iterations of the solver
 __global__
 void computeIteration(unsigned char* dstImg,
@@ -411,11 +410,12 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // CUDA Stream to parallelize independent kernels. We need at most 3
   // streams
 
-  cudaStream_t s1, s2, s3;
+  cudaStream_t s1, s2, s3, s4;
 
   cudaStreamCreate (&s1);
   cudaStreamCreate (&s2);
   cudaStreamCreate (&s3);
+  cudaStreamCreate (&s4);
 
   //Copying Source, Destination and Blended Images on the GPU
   checkCudaErrors
@@ -461,24 +461,27 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   checkCudaErrors(cudaMemset(g_blue, 0, srcSize * sizeof(float)));
 
   //Launch Kernels
-  computeG_kernel<<<grid_size,block_size>>>
+  computeG_kernel<<<grid_size,block_size, 0, s1>>>
     (red_src,g_red,numRowsSource,numColsSource,strictInteriorPixels);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeG_kernel<<<grid_size,block_size>>>
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  computeG_kernel<<<grid_size,block_size, 0, s2>>>
     (green_src,g_green,numRowsSource,numColsSource,strictInteriorPixels);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeG_kernel<<<grid_size,block_size>>>
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  computeG_kernel<<<grid_size,block_size, 0, s3>>>
     (blue_src,g_blue,numRowsSource,numColsSource,strictInteriorPixels);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Launch Copy Kernel for blended image buffers
-  copy_kernel<<<grid_size,block_size>>>
+  copy_kernel<<<grid_size,block_size, 0, s4>>>
     (red_src,green_src,blue_src,
      numRowsSource,numColsSource,
      blendedValsRed_1,blendedValsGreen_1,blendedValsBlue_1,
      blendedValsRed_2,blendedValsGreen_2,blendedValsBlue_2);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());  
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());  
 
+  // Wait for all streams to be done
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  
   //Launching the iterations
   const size_t numIterations = 800;
   float *temp; // For swapping
@@ -562,4 +565,5 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaStreamDestroy (s1);
   cudaStreamDestroy (s2);
   cudaStreamDestroy (s3);
+  cudaStreamDestroy (s4);
 }
