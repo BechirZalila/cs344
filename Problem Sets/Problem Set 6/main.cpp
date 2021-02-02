@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
   	  output_file = std::string(argv[3]);
   	  reference_file = std::string(argv[4]);
   	  perPixelError = atof(argv[5]);
-      globalError   = atof(argv[6]);
+	  globalError   = atof(argv[6]);
   	  break;
   	default:
         std::cerr << "Usage: ./HW6 input_source_file input_dest_filename [output_filename] [reference_filename] [perPixelError] [globalError]" << std::endl;

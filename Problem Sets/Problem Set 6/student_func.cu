@@ -324,7 +324,6 @@ void computeAllIterations(unsigned char* dstImg,
   for (int i = 0; i < numIterations; i++) {
     // Swap the buffers
     temp = old_f; old_f = new_f; new_f = temp;
-    __syncthreads();
     
     // Reset the sums
     blendedSum = 0.f;
@@ -365,8 +364,7 @@ void computeAllIterations(unsigned char* dstImg,
 
     float f_next_val = (blendedSum + borderSum + g[offset]) / 4.f;
 
-    new_f [offset] = fmin(255.f, fmax(0.f, f_next_val));
-    //clip to [0, 255]
+    new_f [offset] = fmin(255.f, fmax(0.f, f_next_val)); //clip to [0, 255]
 
     // Wait for the output buffer to be entirely computed
     __syncthreads();
