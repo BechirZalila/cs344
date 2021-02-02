@@ -610,20 +610,23 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //   blendedValsBlue_2 = temp;
   // }
 
-  computeAllIterations<<<grid_size, block_size>>>
+  computeAllIterations<<<grid_size, block_size, 0, s1>>>
     (red_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsRed_1, g_red,
      blendedValsRed_2, numIterations);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeAllIterations<<<grid_size,block_size>>>
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  computeAllIterations<<<grid_size,block_size, 0, s2>>>
     (green_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsGreen_1, g_green,
      blendedValsGreen_2, numIterations);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeAllIterations<<<grid_size,block_size>>>
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  computeAllIterations<<<grid_size,block_size, 0, s3>>>
     (blue_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
      blendedValsBlue_2, numIterations);
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
   // Swap
