@@ -305,7 +305,7 @@ void computeAllIterations(unsigned char* dstImg,
 			 // pong in and out buffers.
 
   // Load input f into shared memory
-  doubleBuffed [offset] = f [offset];
+  doubleBuffer [offset] = f [offset];
   __syncthreads();
 
   for (int i = 0; i < numIterations; i++) {
