@@ -588,7 +588,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     blendedValsRed_1 = blendedValsRed_2;
     blendedValsRed_2 = temp;
     }*/
-  printf ("%d\n", 2*srcSize*sizeof(float));
+  printf ("%ld\n", 2*srcSize*sizeof(float));
   computeAllIterations<<<grid_size, block_size>>>
     (red_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsRed_1, g_red,
