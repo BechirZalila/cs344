@@ -575,11 +575,11 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Launch Copy Kernel for blended image buffers
-  copy_kernel<<<grid_size,block_size, 0, s4>>>
-    (red_src,green_src,blue_src,
-     numRowsSource,numColsSource,
-     blendedValsRed_1,blendedValsGreen_1,blendedValsBlue_1,
-     blendedValsRed_2,blendedValsGreen_2,blendedValsBlue_2);
+  // copy_kernel<<<grid_size,block_size, 0, s4>>>
+  //   (red_src,green_src,blue_src,
+  //    numRowsSource,numColsSource,
+  //    blendedValsRed_1,blendedValsGreen_1,blendedValsBlue_1,
+  //    blendedValsRed_2,blendedValsGreen_2,blendedValsBlue_2);
   //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   elem_copy_kernel<<<grid_size,block_size, 0, s4>>>
