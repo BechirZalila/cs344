@@ -186,6 +186,15 @@ void reference_calc(const uchar4* const h_sourceImg,
     blendedValsGreen_2[i] = green_src[i];
   }
 
+  printf ("Ref. : ");
+  for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
+    if (strictInteriorPixels [j]) {
+      printf ("%2.2f ", blendedValsRed_1[j]);
+      k++;
+    }
+  }
+  printf ("\n");
+
   //Perform the solve on each color channel
   const size_t numIterations = 800;
   for (size_t i = 0; i < numIterations; ++i) {
