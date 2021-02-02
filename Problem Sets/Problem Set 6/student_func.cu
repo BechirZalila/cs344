@@ -690,10 +690,10 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   param.g = g_red;
   param.f_next = blendedValsRed_2;
   param.numIterations = numIterations;
-  //void *kArgs = &param;
+  void *kArgs = &param;
   
-  //cudaLaunchCooperativeKernel
-  //  ((void *)computeAllIterations,grid_size, block_size, &kArgs);
+  cudaLaunchCooperativeKernel
+    ((void *)computeAllIterations,grid_size, block_size, &kArgs);
 
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
