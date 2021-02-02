@@ -62,8 +62,6 @@
     In this assignment we will do 800 iterations.
    */
 
-
-
 #include "utils.h"
 #include <thrust/host_vector.h>
 
@@ -107,7 +105,6 @@ void mask_kernel(unsigned char* mask,
 		    greenChannel[index] +
 		    blueChannel[index]) < 3 * 255) ? 1 : 0;
   }
-
 }
 
 // This kernel uses the copy mask to compute the border and the
@@ -118,7 +115,6 @@ void interior_and_border_pixels(unsigned char* mask,
 				int numColsSource,
 				unsigned char* borderPixels,
 				unsigned char* strictInteriorPixels)
-                      
 {
   int r = threadIdx.x + blockDim.x * blockIdx.x;
   int c = threadIdx.y + blockDim.y * blockIdx.y;
@@ -150,7 +146,7 @@ void interior_and_border_pixels(unsigned char* mask,
 }
 
 // This kernel pre-compute the values of g, which depend only the
-//source image and aren't iteration dependent.
+// source image and aren't iteration dependent.
 __global__
 void computeG_kernel(unsigned char* channel,
                       float* g,
@@ -207,7 +203,7 @@ void copy_kernel(unsigned char* red_src,
   blendedValsGreen_2[i] = (float)green_src[i];
 }
 
-//Performs 1 of the 800 iterations of the solver
+// Performs 1 of the 800 iterations of the solver
 __global__
 void computeIteration(unsigned char* dstImg,
                       unsigned char* strictInteriorPixels,
@@ -573,7 +569,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   const int numIterations = 800;
   float *temp; // For swapping
   
-  /*for(int i=0;i<numIterations;i++){
+  for(int i=0;i<numIterations;i++){
     computeIteration<<<grid_size,block_size>>>
       (red_dst, strictInteriorPixels, borderPixels,
        numRowsSource, numColsSource, blendedValsRed_1, g_red,
@@ -584,17 +580,17 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     temp = blendedValsRed_1;
     blendedValsRed_1 = blendedValsRed_2;
     blendedValsRed_2 = temp;
-    }*/
-  computeAllIterations<<<grid_size, block_size>>>
-    (red_dst, strictInteriorPixels, borderPixels,
-     numRowsSource, numColsSource, blendedValsRed_1, g_red,
-     blendedValsRed_2, numIterations);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  }
+  // computeAllIterations<<<grid_size, block_size>>>
+  //   (red_dst, strictInteriorPixels, borderPixels,
+  //    numRowsSource, numColsSource, blendedValsRed_1, g_red,
+  //    blendedValsRed_2, numIterations);
+  // cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  // Swap
-  temp = blendedValsRed_1;
-  blendedValsRed_1 = blendedValsRed_2;
-  blendedValsRed_2 = temp;
+  // // Swap
+  // temp = blendedValsRed_1;
+  // blendedValsRed_1 = blendedValsRed_2;
+  // blendedValsRed_2 = temp;
   
   for(int i=0;i<numIterations;i++){
     computeIteration<<<grid_size,block_size>>>
