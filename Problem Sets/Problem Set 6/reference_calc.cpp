@@ -196,18 +196,6 @@ void reference_calc(const uchar4* const h_sourceImg,
     std::swap(blendedValsRed_1, blendedValsRed_2);
   }
 
-  
-  // debug
-
-  printf ("Ref. : ");
-  for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
-    if (strictInteriorPixels [j] == 1) {
-      printf ("%2.2f ", blendedValsRed_1[j]);
-      k++;
-    }
-  }
-  printf ("\n");
-
   for (size_t i = 0; i < numIterations; ++i) {
     computeIteration(blue_dst, strictInteriorPixels, borderPixels,
                      interiorPixelList, numColsSource, blendedValsBlue_1, g_blue,

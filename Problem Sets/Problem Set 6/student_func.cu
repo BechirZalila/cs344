@@ -601,7 +601,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   
   //Launching the iterations
   const int numIterations = 800;
-  float *temp; // For swapping
+  //float *temp; // For swapping
   
   // for(int i=0;i<numIterations;i++){
   //   computeIteration<<<grid_size,block_size>>>
@@ -666,36 +666,6 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  // Debug
-  float *h_blendedValsRed = (float *) malloc
-    (numRowsSource * numColsSource * sizeof(float));
-  unsigned char *h_strictInteriorPixels = (unsigned char *) malloc
-    (numRowsSource * numColsSource * sizeof(unsigned char));
-  
-  checkCudaErrors
-    (cudaMemcpy
-     (h_blendedValsRed,
-      blendedValsRed_1,
-      numRowsSource * numColsSource * sizeof(float),
-      cudaMemcpyDeviceToHost));
-  checkCudaErrors
-    (cudaMemcpy
-     (h_strictInteriorPixels,
-      strictInteriorPixels,
-      numRowsSource * numColsSource * sizeof(unsigned char),
-      cudaMemcpyDeviceToHost));
-  
-  printf ("Your : ");
-  for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
-    if (h_strictInteriorPixels [j] == 1) {
-      printf ("%2.2f ", h_blendedValsRed[j]);
-      k++;
-    }
-  }
-  printf ("\n");
-  free (h_blendedValsRed);
-  free (h_strictInteriorPixels);
-  
   //Blending Kernel
   blend_kernel<<<grid_size,block_size>>>
     (d_blendedImg,strictInteriorPixels,
