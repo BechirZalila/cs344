@@ -377,16 +377,6 @@ void computeAllIterations(unsigned char* dstImg,
   f_next [offset] = new_f [offset];
   //__syncthreads();
 
-  if (offset == 0) {
-    printf ("Your : ");
-    for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
-      if (strictInteriorPixels [j] == 1) {
-	printf ("%2.2f ", f_next[j]);
-	k++;
-      }
-    }
-    printf ("\n");
-  }
 }
 
 __global__
@@ -675,6 +665,16 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  // Debug
+  printf ("Your : ");
+  for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
+    if (strictInteriorPixels [j] == 1) {
+      printf ("%2.2f ", blendedValsRed_2[j]);
+      k++;
+    }
+  }
+  printf ("\n");
   
   //Blending Kernel
   blend_kernel<<<grid_size,block_size>>>
