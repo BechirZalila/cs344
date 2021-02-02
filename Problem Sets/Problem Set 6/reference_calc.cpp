@@ -199,6 +199,7 @@ void reference_calc(const uchar4* const h_sourceImg,
   
   // debug
 
+  printf ("Ref. : ");
   for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
     if (strictInteriorPixels [j]) {
       printf ("%2.2f ", blendedValsRed_1[j]);
