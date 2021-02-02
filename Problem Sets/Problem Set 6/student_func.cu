@@ -503,16 +503,18 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //Copying Source, Destination and Blended Images on the GPU
   checkCudaErrors
     (cudaMemcpyAsync
-     (d_sourceImg,h_sourceImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice));
+     (d_sourceImg,h_sourceImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice, s1));
   checkCudaErrors
     (cudaMemcpyAsync
-     (d_destImg,h_destImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice));
+     (d_destImg,h_destImg,srcSize*sizeof(uchar4),cudaMemcpyHostToDevice, s2));
 
   //Copying Destination Image to the Blended Image
   checkCudaErrors
     (cudaMemcpyAsync
-     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice));
+     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice, s1));
 
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  
   // Split the source and destination images into their respective channels
   separateChannels<<<grid_size,block_size>>>
     (d_sourceImg,numRowsSource,numColsSource,red_src,green_src,blue_src);
