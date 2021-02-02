@@ -298,14 +298,17 @@ void computeAllIterations(unsigned char* dstImg,
   
   int offset = x*numColsSource+y;
   
-  float *old_f = f;
-  float *new_f = f_next;
+  float *old_f = f_next;
+  float *new_f = f;
   float *temp; // for swapping
 
   if(!(strictInteriorPixels[offset]==1))
     return;
 
   for (int i = 0; i < numIterations; i++) {
+    // Swap the buffers
+    temp = old_f; old_f = new_f; new_f = temp;
+    
     // Reset the sums
     blendedSum = 0.f;
     borderSum  = 0.f;
@@ -349,11 +352,6 @@ void computeAllIterations(unsigned char* dstImg,
 
     // Wait for the output buffer to be entirely computed
     __syncthreads();
-
-    // Swap the buffers
-    temp = old_f;
-    old_f = new_f;
-    new_f = temp;
     
   }
 
