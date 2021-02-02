@@ -577,6 +577,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Launch Copy Kernel for blended image buffers
+
   // copy_kernel<<<grid_size,block_size, 0, s4>>>
   //   (red_src,green_src,blue_src,
   //    numRowsSource,numColsSource,

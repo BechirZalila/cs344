@@ -229,6 +229,12 @@ void reference_calc(const uchar4* const h_sourceImg,
     h_blendedImg[offset].z = blendedValsGreen_2[offset];
   }
 
+  // debug
+  for (int j = 0; j < 100; j++) {
+    prinff ("%2.2f ", blendedValsRed_2[j]);
+  }
+  prinf ("\n");
+
   //wow, we allocated a lot of memory!
   delete[] mask;
   delete[] blendedValsRed_1;
