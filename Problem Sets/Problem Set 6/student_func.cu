@@ -667,14 +667,33 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Debug
+  float *h_blendedValsRed = malloc
+    (numRowsSource * numColsSource * sizeof(float));
+  float *h_strictInteriorPixels = malloc
+    (numRowsSource * numColsSource * sizeof(unsigned char));
+  
+  checkCudaErrors
+    (cudaMemcpy
+     (h_blendedValsRed,
+      blendedValsRed_2,
+      numRowsSource * numColsSource * sizeof(float),
+      cudaMemcpyDeviceToHost));
+  checkCudaErrors
+    (cudaMemcpy
+     (h_strictInteriorPixels,
+      strictInteriorPixels,
+      numRowsSource * numColsSource * sizeof(unsigned char),
+      cudaMemcpyDeviceToHost));
+  
   printf ("Your : ");
   for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
-    if (strictInteriorPixels [j] == 1) {
-      printf ("%2.2f ", blendedValsRed_2[j]);
+    if (h_strictInteriorPixels [j] == 1) {
+      printf ("%2.2f ", h_blendedValsRed[j]);
       k++;
     }
   }
   printf ("\n");
+  free (blendedValsRed);
   
   //Blending Kernel
   blend_kernel<<<grid_size,block_size>>>
