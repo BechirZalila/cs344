@@ -373,7 +373,7 @@ void computeAllIterations(unsigned char* dstImg,
 
     // FIXME: this is definitely wrong since __syncthreads only
     // syncronizes threads within the same block.
-    g.sync();
+    grp.sync();
     //__syncthreads();
   }
 
