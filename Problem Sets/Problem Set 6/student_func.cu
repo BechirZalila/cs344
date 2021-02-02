@@ -322,7 +322,7 @@ void computeAllIterations(unsigned char* dstImg,
   if(!(strictInteriorPixels[offset]==1))
     return;
 
-  cooperative_groups::thread_group grp = this_grid();
+  cooperative_groups::thread_group grp = cooperative_groups::this_grid();
 
   for (int i = 0; i < numIterations; i++) {
     // Swap the buffers
