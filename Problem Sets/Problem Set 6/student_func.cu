@@ -289,15 +289,14 @@ void computeAllIterations(unsigned char* dstImg,
   int x = threadIdx.x + blockDim.x * blockIdx.x;
   int y = threadIdx.y + blockDim.y * blockIdx.y;
   int n = numRowsSource * numColsSource;
+  float blendedSum;
+  float borderSum;
   
   if(x>=numRowsSource || y>=numColsSource )
     return;
   
   int offset = x*numColsSource+y;
   
-  if(!(strictInteriorPixels[offset]==1))
-    return;
-
   extern __shared__ float doubleBuffer[]; // Allocated on kernel
 					  // call. The size of this
 					  // buffer is double the size of f
@@ -308,11 +307,18 @@ void computeAllIterations(unsigned char* dstImg,
   doubleBuffer [offset] = f [offset];
   __syncthreads();
 
+  if(!(strictInteriorPixels[offset]==1))
+    return;
+
   for (int i = 0; i < numIterations; i++) {
     pout = 1 - pout; pin = 1 - pin; // Switch input and output
-    
-    float blendedSum = 0.f;
-    float borderSum  = 0.f;
+
+    printf ("%d : %d : %d : %d\n",
+	    n, offset, pin*n + offset, pout * n + offset);
+
+    // Reset the sums
+    blendedSum = 0.f;
+    borderSum  = 0.f;
     
     //process all 4 neighbor pixels for each pixel if it is an
     //interior pixel then we add the previous f, otherwise if it is a
@@ -586,7 +592,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     (red_dst, strictInteriorPixels, borderPixels,
      numRowsSource, numColsSource, blendedValsRed_1, g_red,
      blendedValsRed_2, numIterations);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Swap
   temp = blendedValsRed_1;
