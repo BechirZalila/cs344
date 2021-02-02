@@ -290,7 +290,7 @@ void computeAllIterations(unsigned char* dstImg,
 {
   int x = threadIdx.x + blockDim.x * blockIdx.x;
   int y = threadIdx.y + blockDim.y * blockIdx.y;
-    float blendedSum;
+  float blendedSum;
   float borderSum;
   
   if(x>=numRowsSource || y>=numColsSource )
@@ -313,10 +313,10 @@ void computeAllIterations(unsigned char* dstImg,
     blendedSum = 0.f;
     borderSum  = 0.f;
     
-    //process all 4 neighbor pixels for each pixel if it is an
-    //interior pixel then we add the previous f, otherwise if it is a
-    //border pixel then we add the value of the destination image at
-    //the border.  These border values are our boundary conditions.
+    // Process all 4 neighbor pixels for each pixel if it is an
+    // interior pixel then we add the previous f, otherwise if it is a
+    // border pixel then we add the value of the destination image at
+    // the border.  These border values are our boundary conditions.
     if (strictInteriorPixels[offset - 1]) {
       blendedSum += old_f [offset - 1];
     }
@@ -352,7 +352,6 @@ void computeAllIterations(unsigned char* dstImg,
 
     // Wait for the output buffer to be entirely computed
     __syncthreads();
-    
   }
 
   // Set final output buffer. Since we do the swap at the end of the
@@ -591,9 +590,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Swap
-  temp = blendedValsRed_1;
-  blendedValsRed_1 = blendedValsRed_2;
-  blendedValsRed_2 = temp;
+  //temp = blendedValsRed_1;
+  //blendedValsRed_1 = blendedValsRed_2;
+  //blendedValsRed_2 = temp;
   
   for(int i=0;i<numIterations;i++){
     computeIteration<<<grid_size,block_size>>>
