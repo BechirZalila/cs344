@@ -651,21 +651,42 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // No need for the final swap as in the reference computation. We
   // just use the _1 variables instead of the _2 ones.
   
-  computeAllIterations<<<grid_size, block_size, 0, s1>>>
-    (red_dst, strictInteriorPixels, borderPixels,
-     numRowsSource, numColsSource, blendedValsRed_1, g_red,
-     blendedValsRed_2, numIterations);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeAllIterations<<<grid_size,block_size, 0, s2>>>
-    (green_dst, strictInteriorPixels, borderPixels,
-     numRowsSource, numColsSource, blendedValsGreen_1, g_green,
-     blendedValsGreen_2, numIterations);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  computeAllIterations<<<grid_size,block_size, 0, s3>>>
-    (blue_dst, strictInteriorPixels, borderPixels,
-     numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
-     blendedValsBlue_2, numIterations);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  // computeAllIterations<<<grid_size, block_size, 0, s1>>>
+  //   (red_dst, strictInteriorPixels, borderPixels,
+  //    numRowsSource, numColsSource, blendedValsRed_1, g_red,
+  //    blendedValsRed_2, numIterations);
+  // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  // computeAllIterations<<<grid_size,block_size, 0, s2>>>
+  //   (green_dst, strictInteriorPixels, borderPixels,
+  //    numRowsSource, numColsSource, blendedValsGreen_1, g_green,
+  //    blendedValsGreen_2, numIterations);
+  // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  // computeAllIterations<<<grid_size,block_size, 0, s3>>>
+  //   (blue_dst, strictInteriorPixels, borderPixels,
+  //    numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
+  //    blendedValsBlue_2, numIterations);
+  // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  struct params_t {
+    unsigned char* dstImg;
+    unsigned char* strictInteriorPixels;
+    unsigned char* borderPixels;
+    int numRowsSource;
+    int numColsSource;
+    float* f;
+    float* g;
+    float* f_next;
+    int numIterations;
+  }
+
+  param_t param {red_dst, strictInteriorPixels,
+		 borderPixels, numRowsSource, numColsSource,
+		 blendedValsRed_1, g_red,
+		 blendedValsRed_2, numIterations};
+  void *kArgs = {&param};
+  
+  cudaLaunchCooperativeKernel
+    ((void *)computeAllIterations,grid_size, block_size, kArgs);
 
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
