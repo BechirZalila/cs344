@@ -667,33 +667,21 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //    blendedValsBlue_2, numIterations);
   // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  typedef struct {
-    unsigned char* dstImg;
-    unsigned char* strictInteriorPixels;
-    unsigned char* borderPixels;
-    int numRowsSource;
-    int numColsSource;
-    float* f;
-    float* g;
-    float* f_next;
-    int numIterations;
-  } params_t;
-
-  params_t param;
-
-  param.dstImg = red_dst;
-  param.strictInteriorPixels = strictInteriorPixels;
-  param.borderPixels = borderPixels;
-  param.numRowsSource = numRowsSource;
-  param.numColsSource = numColsSource;
-  param.f = blendedValsRed_1;
-  param.g = g_red;
-  param.f_next = blendedValsRed_2;
-  param.numIterations = numIterations;
-  void *kArgs = &param;
+  void * kArgs[] =
+    {
+     (void *)& red_dst,
+     (void *)& strictInteriorPixels,
+     (void *)& borderPixels,
+     (void *)& numRowsSource,
+     (void *)& numColsSource,
+     (void *)& blendedValsRed_1,
+     (void *)& g_red,
+     (void *)& blendedValsRed_2,
+     (void *)& numIterations
+    };
   
   cudaLaunchCooperativeKernel
-    ((void *)computeAllIterations,grid_size, block_size, &kArgs);
+    ((void *)computeAllIterations, grid_size, block_size, kArgs);
 
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
