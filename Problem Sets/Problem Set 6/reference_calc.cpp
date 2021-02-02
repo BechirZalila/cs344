@@ -196,6 +196,17 @@ void reference_calc(const uchar4* const h_sourceImg,
     std::swap(blendedValsRed_1, blendedValsRed_2);
   }
 
+  
+  // debug
+  int k = 0;
+  for (int j = 0; j < numRowsSource * numColsSource ; j++) {
+    if (strictInteriorPixels [j]) {
+      printf ("%2.2f ", blendedValsRed_1[j]);
+      k++;
+    }
+  }
+  printf ("\n");
+
   for (size_t i = 0; i < numIterations; ++i) {
     computeIteration(blue_dst, strictInteriorPixels, borderPixels,
                      interiorPixelList, numColsSource, blendedValsBlue_1, g_blue,
@@ -228,12 +239,6 @@ void reference_calc(const uchar4* const h_sourceImg,
     h_blendedImg[offset].y = blendedValsBlue_2[offset];
     h_blendedImg[offset].z = blendedValsGreen_2[offset];
   }
-
-  // debug
-  for (int j = 0; j < 100; j++) {
-    printf ("%2.2f ", blendedValsRed_2[j]);
-  }
-  printf ("\n");
 
   //wow, we allocated a lot of memory!
   delete[] mask;
