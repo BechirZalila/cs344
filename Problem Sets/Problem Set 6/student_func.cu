@@ -511,7 +511,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //Copying Destination Image to the Blended Image
   checkCudaErrors
     (cudaMemcpyAsync
-     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice, s3));
+     (d_blendedImg,d_destImg,srcSize*sizeof(uchar4),cudaMemcpyDeviceToDevice, s2));
 
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
