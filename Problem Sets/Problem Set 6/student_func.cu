@@ -600,9 +600,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //   }
   
   // Swap
-  temp = blendedValsRed_1;
-  blendedValsRed_1 = blendedValsRed_2;
-  blendedValsRed_2 = temp;
+  //temp = blendedValsRed_1;
+  //blendedValsRed_1 = blendedValsRed_2;
+  //blendedValsRed_2 = temp;
   
   
   for(int i=0;i<numIterations;i++){
