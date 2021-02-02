@@ -228,39 +228,119 @@ void computeIteration(unsigned char* dstImg,
   
   if(!(strictInteriorPixels[offset]==1))
     return;
+  
+  float blendedSum = 0.f;
+  float borderSum  = 0.f;
+  
+  //process all 4 neighbor pixels for each pixel if it is an interior
+  //pixel then we add the previous f, otherwise if it is a border
+  //pixel then we add the value of the destination image at the
+  //border.  These border values are our boundary conditions.
+  if (strictInteriorPixels[offset - 1]) {
+    blendedSum += f[offset - 1];
+  }
+  else {
+    borderSum += dstImg[offset - 1];
+  }
+  
+  if (strictInteriorPixels[offset + 1]) {
+    blendedSum += f[offset + 1];
+  }
+  else {
+    borderSum += dstImg[offset + 1];
+  }
+  
+  if (strictInteriorPixels[offset - numColsSource]) {
+    blendedSum += f[offset - numColsSource];
+  }
+  else {
+    borderSum += dstImg[offset - numColsSource];
+  }
+  
+  if (strictInteriorPixels[offset + numColsSource]) {
+    blendedSum += f[offset + numColsSource];
+  }
+  else {
+    borderSum += dstImg[offset + numColsSource];
+  }
+  
+  float f_next_val = (blendedSum + borderSum + g[offset]) / 4.f;
+  
+  f_next[offset] = fmin(255.f, fmax(0.f, f_next_val)); //clip to [0, 255]
+  
+  __syncthreads();
+  
+  //Swapping phase
+}
 
+// Compute all iterations in one kernel. necessary to parallelize the
+// handling of R, G and B
+__global__
+void computeAllIterations(unsigned char* dstImg,
+			  unsigned char* strictInteriorPixels,
+			  unsigned char* borderPixels,
+			  int numRowsSource,
+			  int numColsSource,
+			  float* f,
+			  float* g,
+			  float* f_next,
+			  int numIterations)
+{
+  int x = threadIdx.x + blockDim.x * blockIdx.x;
+  int y = threadIdx.y + blockDim.y * blockIdx.y;
+  int n = numRowsSource * numColsSource;
+  
+  if(x>=numRowsSource || y>=numColsSource )
+    return;
+  
+  int offset = x*numColsSource+y;
+  
+  if(!(strictInteriorPixels[offset]==1))
+    return;
+
+  extern __shared__ float doubleBuffer[]; // Allocated on kernel
+					  // call. The size of this
+					  // buffer is double the size of f
+  int pout = 0; pin = 1; // Will be swapped at each iteration to ping
+			 // pong in and out buffers.
+
+  // Load input f into shared memory
+  doubleBuffed [offset] = f [offset];
+  __syncthreads();
+
+  for (int i = 0; i < numIterations; i++) {
+    pout = 1 - pout; pin = 1 - pin; // Switch input and output
+    
     float blendedSum = 0.f;
     float borderSum  = 0.f;
-
-    //process all 4 neighbor pixels
-    //for each pixel if it is an interior pixel
-    //then we add the previous f, otherwise if it is a
-    //border pixel then we add the value of the destination
-    //image at the border.  These border values are our boundary
-    //conditions.
+    
+    //process all 4 neighbor pixels for each pixel if it is an
+    //interior pixel then we add the previous f, otherwise if it is a
+    //border pixel then we add the value of the destination image at
+    //the border.  These border values are our boundary conditions.
     if (strictInteriorPixels[offset - 1]) {
-      blendedSum += f[offset - 1];
+      blendedSum += doubleBuffer [pin*n + offset - 1];
     }
     else {
       borderSum += dstImg[offset - 1];
     }
     
     if (strictInteriorPixels[offset + 1]) {
-      blendedSum += f[offset + 1];
+      blendedSum += doubleBuffer [pin * n + offset + 1];
     }
     else {
       borderSum += dstImg[offset + 1];
     }
     
     if (strictInteriorPixels[offset - numColsSource]) {
-      blendedSum += f[offset - numColsSource];
+      blendedSum += doubleBuffer [pin * n + offset - numColsSource];
     }
     else {
       borderSum += dstImg[offset - numColsSource];
     }
     
     if (strictInteriorPixels[offset + numColsSource]) {
-      blendedSum += f[offset + numColsSource];
+      blendedSum += doubleBuffer [pin * n + offset + numColsSource];
     }
     else {
       borderSum += dstImg[offset + numColsSource];
@@ -268,11 +348,15 @@ void computeIteration(unsigned char* dstImg,
     
     float f_next_val = (blendedSum + borderSum + g[offset]) / 4.f;
     
-    f_next[offset] = fmin(255.f, fmax(0.f, f_next_val)); //clip to [0, 255]
-    
-    __syncthreads();
+    doubleBuffer [pout * n + offset] = fmin(255.f, fmax(0.f, f_next_val));
+    //clip to [0, 255]
 
-    //Swapping phase
+    // Wait for the output buffer to be entirely computed
+    __syncthreads();    
+  }
+
+  // Set final output buffer
+  f_next [offset] = doubleBuffer [pout * n + offset];
 }
 
 __global__
@@ -483,7 +567,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
   
   //Launching the iterations
-  const size_t numIterations = 800;
+  const int numIterations = 800;
   float *temp; // For swapping
   
   for(int i=0;i<numIterations;i++){
