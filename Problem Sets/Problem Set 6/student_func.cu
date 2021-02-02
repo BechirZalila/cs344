@@ -64,6 +64,7 @@
 
 #include "utils.h"
 #include <thrust/host_vector.h>
+#include <cooperative_groups.h>
 
 //This kernel takes in an image represented as a uchar4 and splits
 //it into three matrices of only one color R, G or B each
@@ -321,7 +322,7 @@ void computeAllIterations(unsigned char* dstImg,
   if(!(strictInteriorPixels[offset]==1))
     return;
 
-  grid_group g = this_grid();
+  grid_group grp = this_grid();
 
   for (int i = 0; i < numIterations; i++) {
     // Swap the buffers
