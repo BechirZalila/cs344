@@ -376,6 +376,17 @@ void computeAllIterations(unsigned char* dstImg,
   // loop. The newest buffer is stored in old_f
   f_next [offset] = new_f [offset];
   //__syncthreads();
+
+  if (offset == 0) {
+    printf ("Your : ");
+    for (int j = 0, k = 0; (j < numRowsSource * numColsSource) && (k < 100) ; j++) {
+      if (strictInteriorPixels [j] == 1) {
+	printf ("%2.2f ", f_next[j]);
+	k++;
+      }
+    }
+    printf ("\n");
+  }
 }
 
 __global__
