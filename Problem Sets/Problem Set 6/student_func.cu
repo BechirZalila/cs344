@@ -667,7 +667,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //    blendedValsBlue_2, numIterations);
   // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  struct params_t {
+  typedef struct {
     unsigned char* dstImg;
     unsigned char* strictInteriorPixels;
     unsigned char* borderPixels;
@@ -677,7 +677,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     float* g;
     float* f_next;
     int numIterations;
-  };
+  } param_t;
 
   params_t param = {red_dst, strictInteriorPixels,
 		  borderPixels, numRowsSource, numColsSource,
