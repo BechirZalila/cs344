@@ -447,9 +447,10 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // Compute the strictly interior and border pixels
   interior_and_border_pixels<<<grid_size,block_size, s1>>>
     (mask, numRowsSource, numColsSource, borderPixels, strictInteriorPixels);
-  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Wait for all stream to be done
+  cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   // Next we'll precompute the g term - it never changes, no need to
   // recompute every iteration
