@@ -4,7 +4,7 @@
 # <author>  Quan Tran Minh. edit by Johannes Kast, Michael Sarahan </author>
 # <email>   quantm@unist.ac.kr  kast.jo@googlemail.com msarahan@gmail.com</email>
 ############################################################################
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.8)
 
 find_package(CUDA QUIET REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -20,6 +20,19 @@ file( GLOB hdr *.hpp *.h )
 file( GLOB cu *.cu )
 
 SET (HW6_files main.cpp loadSaveImage.cpp reference_calc.cpp compare.cpp)
+
+target_compile_options(target PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
+  --generate-line-info
+  --use_fast_math
+  -O3
+  -arch=sm_75
+  -rdc=true
+  -Xcompiler
+  -Wall
+  -Xcompiler
+  -Wextra
+  -m64
+  >)
 
 add_executable(HW6 ${HW6_files} ${hdr} ${cu})
 target_link_libraries(HW6 ${OpenCV_LIBS})

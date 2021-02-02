@@ -30,6 +30,7 @@ CUDA_INCLUDEPATH=/usr/local/cuda-10.1/include
 #CUDA_LIBPATH=/usr/local/cuda/lib
 
 #no warnings otherwise thrust explodes output
+#-rdc=true is necessary for CUDA cooperative groups
 
 NVCC_OPTS=-O3 -arch=sm_75 -rdc=true -Xcompiler -Wall -Xcompiler -Wextra -m64
 GCC_OPTS=-O3 -Wall -Wextra -m64
