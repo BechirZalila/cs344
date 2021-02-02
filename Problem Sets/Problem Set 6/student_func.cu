@@ -669,7 +669,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // Debug
   float *h_blendedValsRed = (float *) malloc
     (numRowsSource * numColsSource * sizeof(float));
-  float *h_strictInteriorPixels = (unsigned char *) malloc
+  unsigned char *h_strictInteriorPixels = (unsigned char *) malloc
     (numRowsSource * numColsSource * sizeof(unsigned char));
   
   checkCudaErrors
