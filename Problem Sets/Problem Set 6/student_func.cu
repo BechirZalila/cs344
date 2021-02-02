@@ -591,19 +591,10 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
      blendedValsRed_2, numIterations);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  // cudaError_t err = cudaGetLastError();
-
-  // if (err != cudaSuccess)
-  //   {
-  //     fprintf(stderr, "Failed to launch kernel (error code %s)!\n", cudaGetErrorString(err));
-  //     exit(EXIT_FAILURE);
-  //   }
-  
   // Swap
-  //temp = blendedValsRed_1;
-  //blendedValsRed_1 = blendedValsRed_2;
-  //blendedValsRed_2 = temp;
-  
+  temp = blendedValsRed_1;
+  blendedValsRed_1 = blendedValsRed_2;
+  blendedValsRed_2 = temp;
   
   for(int i=0;i<numIterations;i++){
     computeIteration<<<grid_size,block_size>>>
