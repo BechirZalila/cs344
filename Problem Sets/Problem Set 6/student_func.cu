@@ -580,7 +580,17 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
      numRowsSource,numColsSource,
      blendedValsRed_1,blendedValsGreen_1,blendedValsBlue_1,
      blendedValsRed_2,blendedValsGreen_2,blendedValsBlue_2);
-  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());  
+  //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  elem_copy_kernel<<<grid_size,block_size, 0, s4>>>
+    (red_src, numRowsSource,numColsSource,
+     blendedValsRed_1, blendedValsRed_2);
+  elem_copy_kernel<<<grid_size,block_size, 0, s4>>>
+    (green_src, numRowsSource,numColsSource,
+     blendedValsGreen_1, blendedValsGreen_2);
+  elem_copy_kernel<<<grid_size,block_size, 0, s4>>>
+    (blue_src, numRowsSource,numColsSource,
+     blendedValsBlue_1, blendedValsBlue_2);
 
   // Wait for all streams to be done
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
