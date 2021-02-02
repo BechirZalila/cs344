@@ -513,12 +513,14 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // CUDA Stream to parallelize independent kernels. We need at most 3
   // streams
 
-  cudaStream_t s1, s2, s3, s4;
+  cudaStream_t s1, s2, s3, s4, s5, s6;
 
   cudaStreamCreate (&s1);
   cudaStreamCreate (&s2);
   cudaStreamCreate (&s3);
   cudaStreamCreate (&s4);
+  cudaStreamCreate (&s5);
+  cudaStreamCreate (&s6);
 
   //Copying Source, Destination and Blended Images on the GPU
   checkCudaErrors
@@ -585,10 +587,10 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   elem_copy_kernel<<<grid_size,block_size, 0, s4>>>
     (red_src, numRowsSource,numColsSource,
      blendedValsRed_1, blendedValsRed_2);
-  elem_copy_kernel<<<grid_size,block_size, 0, s4>>>
+  elem_copy_kernel<<<grid_size,block_size, 0, s5>>>
     (green_src, numRowsSource,numColsSource,
      blendedValsGreen_1, blendedValsGreen_2);
-  elem_copy_kernel<<<grid_size,block_size, 0, s4>>>
+  elem_copy_kernel<<<grid_size,block_size, 0, s6>>>
     (blue_src, numRowsSource,numColsSource,
      blendedValsBlue_1, blendedValsBlue_2);
 
@@ -699,4 +701,6 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaStreamDestroy (s2);
   cudaStreamDestroy (s3);
   cudaStreamDestroy (s4);
+  cudaStreamDestroy (s5);
+  cudaStreamDestroy (s6);
 }
