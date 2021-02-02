@@ -31,7 +31,6 @@ target_compile_options(HW6 PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
   -Xcompiler
   -Wall
   -Xcompiler
-  -Wextra
   -m64
   >)
 target_link_libraries(HW6 ${OpenCV_LIBS})
