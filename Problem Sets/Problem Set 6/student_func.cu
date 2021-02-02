@@ -301,7 +301,7 @@ void computeAllIterations(unsigned char* dstImg,
   extern __shared__ float doubleBuffer[]; // Allocated on kernel
 					  // call. The size of this
 					  // buffer is double the size of f
-  int pout = 0; pin = 1; // Will be swapped at each iteration to ping
+  int pout = 0, pin = 1; // Will be swapped at each iteration to ping
 			 // pong in and out buffers.
 
   // Load input f into shared memory
