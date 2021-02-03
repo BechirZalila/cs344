@@ -383,6 +383,7 @@ void computeAllIterations(unsigned char* dstImg,
 
 }
 
+// Blend the computed image into the destination
 __global__
 void blend_kernel(uchar4* outputImageRGBA,
 		  unsigned char* strictInteriorPixels,
@@ -405,6 +406,72 @@ void blend_kernel(uchar4* outputImageRGBA,
   
   outputImageRGBA[offset].x = (unsigned char)redChannel[offset];
   outputImageRGBA[offset].y = (unsigned char)greenChannel[offset];
+  outputImageRGBA[offset].z = (unsigned char)blueChannel[offset];
+}
+
+// The 3 kernels below are elementary versions of the kernel above
+// that can be run in parallel.
+
+__global__
+void blend_kernel_red(uchar4* outputImageRGBA,
+		      unsigned char* strictInteriorPixels,
+		      int numRowsSource,
+		      int numColsSource,
+		      float* const redChannel)
+{
+  int x = threadIdx.x + blockDim.x * blockIdx.x;
+  int y = threadIdx.y + blockDim.y * blockIdx.y;
+  
+  if(x>=numRowsSource || y>=numColsSource )
+    return;
+  
+  int offset = x*numColsSource+y;
+  
+  if(!(strictInteriorPixels[offset]==1))
+    return;
+  
+  outputImageRGBA[offset].x = (unsigned char)redChannel[offset];
+}
+
+__global__
+void blend_kernel_green(uchar4* outputImageRGBA,
+			unsigned char* strictInteriorPixels,
+			int numRowsSource,
+			int numColsSource,
+			float* const greenChannel)
+{
+  int x = threadIdx.x + blockDim.x * blockIdx.x;
+  int y = threadIdx.y + blockDim.y * blockIdx.y;
+  
+  if(x>=numRowsSource || y>=numColsSource )
+    return;
+  
+  int offset = x*numColsSource+y;
+  
+  if(!(strictInteriorPixels[offset]==1))
+    return;
+  
+  outputImageRGBA[offset].y = (unsigned char)greenChannel[offset];
+}
+
+__global__
+void blend_kernel_blue(uchar4* outputImageRGBA,
+		       unsigned char* strictInteriorPixels,
+		       int numRowsSource,
+		       int numColsSource,
+		       float* const blueChannel)
+{
+  int x = threadIdx.x + blockDim.x * blockIdx.x;
+  int y = threadIdx.y + blockDim.y * blockIdx.y;
+  
+  if(x>=numRowsSource || y>=numColsSource )
+    return;
+  
+  int offset = x*numColsSource+y;
+  
+  if(!(strictInteriorPixels[offset]==1))
+    return;
+  
   outputImageRGBA[offset].z = (unsigned char)blueChannel[offset];
 }
 
@@ -732,11 +799,30 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   //Blending Kernel
-  blend_kernel<<<grid_size,block_size>>>
+  // blend_kernel<<<grid_size,block_size>>>
+  //   (d_blendedImg,strictInteriorPixels,
+  //    numRowsSource,numColsSource,
+  // // blendedValsRed_2, blendedValsGreen_2, blendedValsBlue_2);
+  //    blendedValsRed_1, blendedValsGreen_1, blendedValsBlue_1);
+  // cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+
+  //Blending Kernels in parallel
+  blend_kernel_red<<<grid_size,block_size, 0, s1>>>
     (d_blendedImg,strictInteriorPixels,
      numRowsSource,numColsSource,
-  // blendedValsRed_2, blendedValsGreen_2, blendedValsBlue_2);
-     blendedValsRed_1, blendedValsGreen_1, blendedValsBlue_1);
+  // blendedValsRed_2);
+     blendedValsRed_1);
+  blend_kernel_green<<<grid_size,block_size, 0, s2>>>
+    (d_blendedImg,strictInteriorPixels,
+     numRowsSource,numColsSource,
+  // blendedValsGreen_2);
+     blendedValsGreen_1);
+  blend_kernel_blue<<<grid_size,block_size, 0, s3>>>
+    (d_blendedImg,strictInteriorPixels,
+     numRowsSource,numColsSource,
+  // blendedValsBlue_2);
+     blendedValsBlue_1);
+  
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   //Finally Copy back the destination image from the device to the host
