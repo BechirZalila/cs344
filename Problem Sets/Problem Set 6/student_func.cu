@@ -669,32 +669,35 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //    blendedValsBlue_2, numIterations);
   // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  // Get the NVIDIA device properties
-  cudaDeviceProp deviceProp;
-  int devID;
-  checkCudaErrors (cudaGetDevice (&devID));
-  checkCudaErrors (cudaGetDeviceProperties (&deviceProp, devID));
+  // Get the NVIDIA device properties. This code allows to get the
+  // current device properties in order to know whether we can use
+  // collaborative groups or not.
+  
+  // cudaDeviceProp deviceProp;
+  // int devID;
+  // checkCudaErrors (cudaGetDevice (&devID));
+  // checkCudaErrors (cudaGetDeviceProperties (&deviceProp, devID));
 
-  if (!deviceProp.cooperativeLaunch) {
-    printf ("Cooperative Kernel Launch not supported on this device\n");
-    exit (EXIT_FAILURE);
-  }
+  // if (!deviceProp.cooperativeLaunch) {
+  //   printf ("Cooperative Kernel Launch not supported on this device\n");
+  //   exit (EXIT_FAILURE);
+  // }
 
-  int maxActiveBlk;
-  checkCudaErrors (cudaOccupancyMaxActiveBlocksPerMultiprocessor
-		   (&maxActiveBlk, computeAllIterations,
-		    block_size.x*block_size.y*block_size.z, 0));
+  // int maxActiveBlk;
+  // checkCudaErrors (cudaOccupancyMaxActiveBlocksPerMultiprocessor
+  // 		   (&maxActiveBlk, computeAllIterations,
+  // 		    block_size.x*block_size.y*block_size.z, 0));
 
-  printf ("MPC : %d multiprocessors\n", deviceProp.multiProcessorCount);
-  printf ("MAX : %d blocks per MP\n", maxActiveBlk);
-  printf ("GRD : %d x %d x %d = %d blocks total\n",
-	  grid_size.x, grid_size.y, grid_size.z,
-	  (grid_size.x * grid_size.y * grid_size.z));
+  // printf ("MPC : %d multiprocessors\n", deviceProp.multiProcessorCount);
+  // printf ("MAX : %d blocks per MP\n", maxActiveBlk);
+  // printf ("GRD : %d x %d x %d = %d blocks total\n",
+  // 	  grid_size.x, grid_size.y, grid_size.z,
+  // 	  (grid_size.x * grid_size.y * grid_size.z));
 
-  int gg, bb;
-  checkCudaErrors (cudaOccupancyMaxPotentialBlockSize
-		   (&gg, &bb, computeAllIterations));
-  printf ("GG = %d, BB = %d\n", gg, bb);
+  // int gg, bb;
+  // checkCudaErrors (cudaOccupancyMaxPotentialBlockSize
+  // 		   (&gg, &bb, computeAllIterations));
+  // printf ("GG = %d, BB = %d\n", gg, bb);
   
   void * kArgsRed[] =
     {
@@ -712,6 +715,40 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   checkCudaErrors
     (cudaLaunchCooperativeKernel
      ((void *)computeAllIterations, grid_size, block_size, kArgsRed));
+
+  void * kArgsGreen[] =
+    {
+     (void *)& green_dst,
+     (void *)& strictInteriorPixels,
+     (void *)& borderPixels,
+     (void *)& numRowsSource,
+     (void *)& numColsSource,
+     (void *)& blendedValsGreen_1,
+     (void *)& g_red,
+     (void *)& blendedValsGreen_2,
+     (void *)& numIterations
+    };
+  
+  checkCudaErrors
+    (cudaLaunchCooperativeKernel
+     ((void *)computeAllIterations, grid_size, block_size, kArgsGreen));
+
+  void * kArgsBlue[] =
+    {
+     (void *)& blue_dst,
+     (void *)& strictInteriorPixels,
+     (void *)& borderPixels,
+     (void *)& numRowsSource,
+     (void *)& numColsSource,
+     (void *)& blendedValsBlue_1,
+     (void *)& g_red,
+     (void *)& blendedValsBlue_2,
+     (void *)& numIterations
+    };
+  
+  checkCudaErrors
+    (cudaLaunchCooperativeKernel
+     ((void *)computeAllIterations, grid_size, block_size, kArgsBlue));
 
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
