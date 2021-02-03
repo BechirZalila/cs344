@@ -65,6 +65,7 @@
 #include "utils.h"
 #include <thrust/host_vector.h>
 #include <cooperative_groups.h>
+#include <helper_cuda.h>
 
 //This kernel takes in an image represented as a uchar4 and splits
 //it into three matrices of only one color R, G or B each
