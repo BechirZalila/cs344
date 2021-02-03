@@ -683,7 +683,10 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 		   (&maxActiveBlk, computeAllIterations,
 		    block_size.x * block_size.y * block_size.z, 0));
 
-  printf ("MAX : %d blocks per MP\n");
+  printf ("MAX : %d blocks per MP\n", maxActiveBlk);
+  printf ("GRD : %d x %d x %d = %d blocks per MP\n",
+	  grid_size.x, grid_size.y, grid_size.z,
+	  (grid_size.x * grid_size.y * grid_size.z));
   
   void * kArgsRed[] =
     {
