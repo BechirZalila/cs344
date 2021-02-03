@@ -683,8 +683,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 		   (&maxActiveBlk, computeAllIterations,
 		    256, 0));
 
+  printf ("MPC : %d multiprocessors\n", deviceProp.multiProcessorCount);
   printf ("MAX : %d blocks per MP\n", maxActiveBlk);
-  printf ("GRD : %d x %d x %d = %d blocks per MP\n",
+  printf ("GRD : %d x %d x %d = %d blocks total\n",
 	  grid_size.x, grid_size.y, grid_size.z,
 	  (grid_size.x * grid_size.y * grid_size.z));
   
