@@ -607,68 +607,52 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   
   //Launching the iterations
   const int numIterations = 800;
-  //float *temp; // For swapping
+  float *temp; // For swapping
   
-  // for(int i=0;i<numIterations;i++){
-  //   computeIteration<<<grid_size,block_size>>>
-  //     (red_dst, strictInteriorPixels, borderPixels,
-  //      numRowsSource, numColsSource, blendedValsRed_1, g_red,
-  //      blendedValsRed_2);
-  //   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  for(int i=0;i<numIterations;i++){
+    computeIteration<<<grid_size,block_size>>>
+      (red_dst, strictInteriorPixels, borderPixels,
+       numRowsSource, numColsSource, blendedValsRed_1, g_red,
+       blendedValsRed_2);
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  //   // Swap
-  //   temp = blendedValsRed_1;
-  //   blendedValsRed_1 = blendedValsRed_2;
-  //   blendedValsRed_2 = temp;
-  // }
+    // Swap
+    temp = blendedValsRed_1;
+    blendedValsRed_1 = blendedValsRed_2;
+    blendedValsRed_2 = temp;
+  }
   
-  // for(int i=0;i<numIterations;i++){
-  //   computeIteration<<<grid_size,block_size>>>
-  //     (green_dst, strictInteriorPixels, borderPixels,
-  //      numRowsSource, numColsSource, blendedValsGreen_1, g_green,
-  //      blendedValsGreen_2);
-  //   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  for(int i=0;i<numIterations;i++){
+    computeIteration<<<grid_size,block_size>>>
+      (green_dst, strictInteriorPixels, borderPixels,
+       numRowsSource, numColsSource, blendedValsGreen_1, g_green,
+       blendedValsGreen_2);
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  //   // Swap
+    // Swap
 
-  //   temp = blendedValsGreen_1;
-  //   blendedValsGreen_1 = blendedValsGreen_2;
-  //   blendedValsGreen_2 = temp;
-  // }
+    temp = blendedValsGreen_1;
+    blendedValsGreen_1 = blendedValsGreen_2;
+    blendedValsGreen_2 = temp;
+  }
   
-  // for(int i=0;i<numIterations;i++){
-  //   computeIteration<<<grid_size,block_size>>>
-  //     (blue_dst, strictInteriorPixels, borderPixels,
-  //      numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
-  //      blendedValsBlue_2);
-  //   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+  for(int i=0;i<numIterations;i++){
+    computeIteration<<<grid_size,block_size>>>
+      (blue_dst, strictInteriorPixels, borderPixels,
+       numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
+       blendedValsBlue_2);
+    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  //   // Swap
+    // Swap
 
-  //   temp = blendedValsBlue_1;
-  //   blendedValsBlue_1 = blendedValsBlue_2;
-  //   blendedValsBlue_2 = temp;
-  // }
+    temp = blendedValsBlue_1;
+    blendedValsBlue_1 = blendedValsBlue_2;
+    blendedValsBlue_2 = temp;
+  }
 
   // No need for the final swap as in the reference computation. We
   // just use the _1 variables instead of the _2 ones.
   
-  // computeAllIterations<<<grid_size, block_size, 0, s1>>>
-  //   (red_dst, strictInteriorPixels, borderPixels,
-  //    numRowsSource, numColsSource, blendedValsRed_1, g_red,
-  //    blendedValsRed_2, numIterations);
-  // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  // computeAllIterations<<<grid_size,block_size, 0, s2>>>
-  //   (green_dst, strictInteriorPixels, borderPixels,
-  //    numRowsSource, numColsSource, blendedValsGreen_1, g_green,
-  //    blendedValsGreen_2, numIterations);
-  // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-  // computeAllIterations<<<grid_size,block_size, 0, s3>>>
-  //   (blue_dst, strictInteriorPixels, borderPixels,
-  //    numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
-  //    blendedValsBlue_2, numIterations);
-  // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-
   // Get the NVIDIA device properties. This code allows to get the
   // current device properties in order to know whether we can use
   // collaborative groups or not.
@@ -698,57 +682,61 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   // checkCudaErrors (cudaOccupancyMaxPotentialBlockSize
   // 		   (&gg, &bb, computeAllIterations));
   // printf ("GG = %d, BB = %d\n", gg, bb);
-  
-  void * kArgsRed[] =
-    {
-     (void *)& red_dst,
-     (void *)& strictInteriorPixels,
-     (void *)& borderPixels,
-     (void *)& numRowsSource,
-     (void *)& numColsSource,
-     (void *)& blendedValsRed_1,
-     (void *)& g_red,
-     (void *)& blendedValsRed_2,
-     (void *)& numIterations
-    };
-  
-  checkCudaErrors
-    (cudaLaunchCooperativeKernel
-     ((void *)computeAllIterations, grid_size, block_size, kArgsRed));
 
-  void * kArgsGreen[] =
-    {
-     (void *)& green_dst,
-     (void *)& strictInteriorPixels,
-     (void *)& borderPixels,
-     (void *)& numRowsSource,
-     (void *)& numColsSource,
-     (void *)& blendedValsGreen_1,
-     (void *)& g_red,
-     (void *)& blendedValsGreen_2,
-     (void *)& numIterations
-    };
+  // FIXME: the code below can potentially make the run faster. But we
+  // cannot use it since the current device cannot contain as many
+  // block as we need for this problem.
   
-  checkCudaErrors
-    (cudaLaunchCooperativeKernel
-     ((void *)computeAllIterations, grid_size, block_size, kArgsGreen));
+  // void * kArgsRed[] =
+  //   {
+  //    (void *)& red_dst,
+  //    (void *)& strictInteriorPixels,
+  //    (void *)& borderPixels,
+  //    (void *)& numRowsSource,
+  //    (void *)& numColsSource,
+  //    (void *)& blendedValsRed_1,
+  //    (void *)& g_red,
+  //    (void *)& blendedValsRed_2,
+  //    (void *)& numIterations
+  //   };
+  
+  // checkCudaErrors
+  //   (cudaLaunchCooperativeKernel
+  //    ((void *)computeAllIterations, grid_size, block_size, kArgsRed));
 
-  void * kArgsBlue[] =
-    {
-     (void *)& blue_dst,
-     (void *)& strictInteriorPixels,
-     (void *)& borderPixels,
-     (void *)& numRowsSource,
-     (void *)& numColsSource,
-     (void *)& blendedValsBlue_1,
-     (void *)& g_red,
-     (void *)& blendedValsBlue_2,
-     (void *)& numIterations
-    };
+  // void * kArgsGreen[] =
+  //   {
+  //    (void *)& green_dst,
+  //    (void *)& strictInteriorPixels,
+  //    (void *)& borderPixels,
+  //    (void *)& numRowsSource,
+  //    (void *)& numColsSource,
+  //    (void *)& blendedValsGreen_1,
+  //    (void *)& g_red,
+  //    (void *)& blendedValsGreen_2,
+  //    (void *)& numIterations
+  //   };
   
-  checkCudaErrors
-    (cudaLaunchCooperativeKernel
-     ((void *)computeAllIterations, grid_size, block_size, kArgsBlue));
+  // checkCudaErrors
+  //   (cudaLaunchCooperativeKernel
+  //    ((void *)computeAllIterations, grid_size, block_size, kArgsGreen));
+
+  // void * kArgsBlue[] =
+  //   {
+  //    (void *)& blue_dst,
+  //    (void *)& strictInteriorPixels,
+  //    (void *)& borderPixels,
+  //    (void *)& numRowsSource,
+  //    (void *)& numColsSource,
+  //    (void *)& blendedValsBlue_1,
+  //    (void *)& g_red,
+  //    (void *)& blendedValsBlue_2,
+  //    (void *)& numIterations
+  //   };
+  
+  // checkCudaErrors
+  //   (cudaLaunchCooperativeKernel
+  //    ((void *)computeAllIterations, grid_size, block_size, kArgsBlue));
 
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
