@@ -692,7 +692,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   int gg, bb;
   checkCudaErrors (cudaOccupancyMaxPotentialBlockSize
 		   (&gg, &bb, computeAllIterations));
-  printf ("GG = %d, BB = %d\n");
+  printf ("GG = %d, BB = %d\n", gg, bb);
   
   void * kArgsRed[] =
     {
