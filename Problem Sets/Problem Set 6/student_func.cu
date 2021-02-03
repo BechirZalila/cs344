@@ -688,6 +688,11 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   printf ("GRD : %d x %d x %d = %d blocks total\n",
 	  grid_size.x, grid_size.y, grid_size.z,
 	  (grid_size.x * grid_size.y * grid_size.z));
+
+  int gg, bb;
+  checkCudaErrors (CudaOccupancyMaxPotentialBlockSize
+		   (&gg, &bb, computeAllIterations));
+  printf ("GG = %d, BB = %d\n");
   
   void * kArgsRed[] =
     {
