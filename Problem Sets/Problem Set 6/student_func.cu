@@ -678,10 +678,10 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
     exit (EXIT_FAILURE);
   }
 
-  int maxActiveBlk = 25;
+  int maxActiveBlk;
   checkCudaErrors (cudaOccupancyMaxActiveBlocksPerMultiprocessor
 		   (&maxActiveBlk, computeAllIterations,
-		    1024, 0));
+		    512, 0));
 
   printf ("MPC : %d multiprocessors\n", deviceProp.multiProcessorCount);
   printf ("MAX : %d blocks per MP\n", maxActiveBlk);
