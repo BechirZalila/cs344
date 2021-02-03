@@ -690,7 +690,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 	  (grid_size.x * grid_size.y * grid_size.z));
 
   int gg, bb;
-  checkCudaErrors (CudaOccupancyMaxPotentialBlockSize
+  checkCudaErrors (cudaOccupancyMaxPotentialBlockSize
 		   (&gg, &bb, computeAllIterations));
   printf ("GG = %d, BB = %d\n");
   
