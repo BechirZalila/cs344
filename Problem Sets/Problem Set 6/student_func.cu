@@ -667,6 +667,22 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //    blendedValsBlue_2, numIterations);
   // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
+  // Get the NVIDIA device properties
+  cudaDeviceProp deviceProp;
+  int devID = findCudaDevice (argc, (char **)argv);
+  checkCudaErrors (cudaGetDeviceProperties (&deviceProp, devID));
+
+  if (!deviceProp.cooperativeLaunch) {
+    printf ("Cooperative Kernel Launch not supported on this device\n");
+    exit (EXIT_FAILURE);
+  }
+
+  int maxActiveBlk = ;
+  checkCudaErrors (cudaOccupancyMaxActiveBlocksPerMultiprocessor
+		   (&maxActiveBlk, computeAllIterations, block_size, ));
+
+  printf ("MAX : %d blocks per MP\n");
+  
   void * kArgsRed[] =
     {
      (void *)& red_dst,
