@@ -453,10 +453,8 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   */
 
   size_t srcSize = numRowsSource * numColsSource;
-  //dim3 block_size(32,32,1);
-  dim3 block_size(16,8,1);
-  //dim3 grid_size((numRowsSource+32-1)/32, (numColsSource+32-1)/32, 1);
-  dim3 grid_size((numRowsSource+16-1)/16, (numColsSource+8-1)/8, 1);
+  dim3 block_size(32,32,1);
+    dim3 grid_size((numRowsSource+32-1)/32, (numColsSource+32-1)/32, 1);
   
   // Source, Destination and Blended images on GPU
   uchar4* d_sourceImg;
@@ -683,7 +681,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   int maxActiveBlk = 25;
   checkCudaErrors (cudaOccupancyMaxActiveBlocksPerMultiprocessor
 		   (&maxActiveBlk, computeAllIterations,
-		    128, 0));
+		    1024, 0));
 
   printf ("MPC : %d multiprocessors\n", deviceProp.multiProcessorCount);
   printf ("MAX : %d blocks per MP\n", maxActiveBlk);
