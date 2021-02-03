@@ -610,21 +610,21 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   float *temp; // For swapping
   
   for(int i=0;i<numIterations;i++){
-    computeIteration<<<grid_size,block_size>>>
+    computeIteration<<<grid_size,block_size, 0, s1>>>
       (red_dst, strictInteriorPixels, borderPixels,
        numRowsSource, numColsSource, blendedValsRed_1, g_red,
        blendedValsRed_2);
-    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-    computeIteration<<<grid_size,block_size>>>
+    //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+    computeIteration<<<grid_size,block_size, 0, s2>>>
       (green_dst, strictInteriorPixels, borderPixels,
        numRowsSource, numColsSource, blendedValsGreen_1, g_green,
        blendedValsGreen_2);
-    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
-    computeIteration<<<grid_size,block_size>>>
+    //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+    computeIteration<<<grid_size,block_size, 0, s3>>>
       (blue_dst, strictInteriorPixels, borderPixels,
        numRowsSource, numColsSource, blendedValsBlue_1, g_blue,
        blendedValsBlue_2);
-    cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
+    //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
     
     // Swap
     temp = blendedValsRed_1;
