@@ -667,7 +667,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   //    blendedValsBlue_2, numIterations);
   // //cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
-  void * kArgs[] =
+  void * kArgsRed[] =
     {
      (void *)& red_dst,
      (void *)& strictInteriorPixels,
@@ -680,8 +680,9 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
      (void *)& numIterations
     };
   
-  cudaLaunchCooperativeKernel
-    ((void *)computeAllIterations, grid_size, block_size, kArgs);
+  checkCudaErrors
+    (cudaLaunchCooperativeKernel
+     ((void *)computeAllIterations, grid_size, block_size, kArgsRed));
 
   // Wait fo all streams to end
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
