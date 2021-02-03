@@ -745,8 +745,8 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   blend_kernel<<<grid_size,block_size>>>
     (d_blendedImg,strictInteriorPixels,
      numRowsSource,numColsSource,
-     blendedValsRed_2, blendedValsGreen_2, blendedValsBlue_2);
-  // blendedValsRed_1, blendedValsGreen_1, blendedValsBlue_1);
+  // blendedValsRed_2, blendedValsGreen_2, blendedValsBlue_2);
+     blendedValsRed_1, blendedValsGreen_1, blendedValsBlue_1);
   cudaDeviceSynchronize(); checkCudaErrors(cudaGetLastError());
 
   //Finally Copy back the destination image from the device to the host
