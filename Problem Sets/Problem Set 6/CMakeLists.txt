@@ -24,8 +24,8 @@ SET (HW6_files main.cpp loadSaveImage.cpp reference_calc.cpp compare.cpp)
 add_executable(HW6 ${HW6_files} ${hdr} ${cu})
 
 # The 4 lines below implement support of cooperative groups in CMake
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} ;-rdc=true;-gencode=arch=compute_60,code=sm_60)
-string(APPEND CMAKE_CUDA_FLAGS " -gencode arch=compute_60,code=sm_60")
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} ;-rdc=true;-gencode=arch=compute_60,code=sm_60;-gencode=arch=compute_75,code=sm_75)
+string(APPEND CMAKE_CUDA_FLAGS " -gencode arch=compute_60,code=sm_60 -gencode=arch=compute_75,code=sm_75")
 set_target_properties(HW6 PROPERTIES POSITION_INDEPENDENT_CODE  ON)
 set_target_properties(HW6 PROPERTIES CUDA_SEPARABLE_COMPILATION ON)    
 
