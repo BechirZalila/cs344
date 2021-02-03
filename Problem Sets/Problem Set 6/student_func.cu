@@ -65,7 +65,6 @@
 #include "utils.h"
 #include <thrust/host_vector.h>
 #include <cooperative_groups.h>
-#include <helper_cuda.h>
 
 //This kernel takes in an image represented as a uchar4 and splits
 //it into three matrices of only one color R, G or B each
@@ -670,7 +669,8 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
 
   // Get the NVIDIA device properties
   cudaDeviceProp deviceProp;
-  int devID = findCudaDevice (argc, (char **)argv);
+  int devID;
+  checkCudaErrors (cudaGetDevice (&devID));
   checkCudaErrors (cudaGetDeviceProperties (&deviceProp, devID));
 
   if (!deviceProp.cooperativeLaunch) {
