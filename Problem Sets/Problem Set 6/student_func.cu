@@ -681,7 +681,7 @@ void your_blend(const uchar4* const h_sourceImg,  //IN
   int maxActiveBlk;
   checkCudaErrors (cudaOccupancyMaxActiveBlocksPerMultiprocessor
 		   (&maxActiveBlk, computeAllIterations,
-		    block_size.x * block_size.y * block_size.z, 0));
+		    block_size.x * block_size.y * block_size.z, 12));
 
   printf ("MAX : %d blocks per MP\n", maxActiveBlk);
   printf ("GRD : %d x %d x %d = %d blocks per MP\n",
