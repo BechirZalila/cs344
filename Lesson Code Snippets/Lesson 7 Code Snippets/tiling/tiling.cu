@@ -3,8 +3,10 @@
 #include "utils.h"
 
 const int BLOCKSIZE = 128;
-const int NUMBLOCKS = 1000;					// set this to 1 or 2 for debugging
-const int N 		= BLOCKSIZE*NUMBLOCKS;
+const int NUMBLOCKS = 1000;
+// set this to 1 or 2 for debugging
+
+const int N 	    = BLOCKSIZE*NUMBLOCKS;
 
 /* 
  * TODO: modify the foo and bar kernels to use tiling: 
@@ -13,8 +15,10 @@ const int N 		= BLOCKSIZE*NUMBLOCKS;
  *	     - copy the result back to global memory
  *		 - assume thread blocks of 128 threads
  *		 - handle intra-block boundaries correctly
- * You can ignore boundary conditions (we ignore the first 2 and last 2 elements)
+ * You can ignore boundary conditions (we ignore the first 2 and last
+ * 2 elements)
  */
+
 __global__ void foo(float out[], float A[], float B[], float C[], float D[], float E[]){
 
 	int i = threadIdx.x + blockIdx.x*blockDim.x; 
