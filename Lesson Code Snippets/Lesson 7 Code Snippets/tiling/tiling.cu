@@ -133,6 +133,16 @@ int main(int argc, char **argv)
   printf("foo<<<>>>(): %g ms elapsed. Verifying solution...",
 	 fooTimer.Elapsed());
   compareArrays(ref_fooOut, fooOut, N);
+
+  fooTimer.Start();
+  foo_tile<<<N/BLOCKSIZE, BLOCKSIZE>>>
+    (d_fooOut, d_fooA, d_fooB, d_fooC, d_fooD, d_fooE);
+  fooTimer.Stop();
+
+  cudaMemcpy(fooOut, d_fooOut, numBytes, cudaMemcpyDeviceToHost);
+  printf("foo_tile<<<>>>(): %g ms elapsed. Verifying solution...",
+	 fooTimer.Elapsed());
+  compareArrays(ref_fooOut, fooOut, N);
   
   barTimer.Start();
   bar<<<N/BLOCKSIZE, BLOCKSIZE>>>(d_barOut, d_barIn);
