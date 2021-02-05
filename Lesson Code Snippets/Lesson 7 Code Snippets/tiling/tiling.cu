@@ -60,7 +60,7 @@ __global__ void bar_tile(float out[], float in[])
   }
   else if (x == blockDim.x - 1) {
     tile[x + 3] = in[i+1];
-    tilie[x + 4] = in[i+2];
+    tile[x + 4] = in[i+2];
   }
 
   __syncthreads();
