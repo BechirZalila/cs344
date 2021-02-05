@@ -12,11 +12,11 @@ int main(void)
 {
   // generate N random numbers serially
   int N = 10000000;
-  thrust::host_vector<char> h_vec(N);
+  thrust::host_vector<float> h_vec(N);
   std::generate(h_vec.begin(), h_vec.end(), rand);
 
   // transfer data to the device
-  thrust::device_vector<char> d_vec = h_vec;
+  thrust::device_vector<float> d_vec = h_vec;
 
   // sort data on the device (846M keys per second on GeForce GTX 480)
   GpuTimer timer;
