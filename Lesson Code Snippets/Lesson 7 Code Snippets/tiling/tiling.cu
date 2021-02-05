@@ -112,7 +112,8 @@ int main(int argc, char **argv)
   // launch and time foo and bar
   GpuTimer fooTimer, barTimer;
   fooTimer.Start();
-  foo<<<N/BLOCKSIZE, BLOCKSIZE>>>(d_fooOut, d_fooA, d_fooB, d_fooC, d_fooD, d_fooE);
+  foo<<<N/BLOCKSIZE, BLOCKSIZE>>>
+    (d_fooOut, d_fooA, d_fooB, d_fooC, d_fooD, d_fooE);
   fooTimer.Stop();
   
   barTimer.Start();
