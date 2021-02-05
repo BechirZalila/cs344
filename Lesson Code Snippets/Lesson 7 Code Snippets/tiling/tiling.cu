@@ -152,6 +152,15 @@ int main(int argc, char **argv)
   printf("bar<<<>>>(): %g ms elapsed. Verifying solution...",
 	 barTimer.Elapsed());
   compareArrays(ref_barOut, barOut, N);
+
+  barTimer.Start();
+  bar_tiled<<<N/BLOCKSIZE, BLOCKSIZE>>>(d_barOut, d_barIn);
+  barTimer.Stop();
+  
+  cudaMemcpy(barOut, d_barOut, numBytes, cudaMemcpyDeviceToHost);
+  printf("bar_tiled<<<>>>(): %g ms elapsed. Verifying solution...",
+	 barTimer.Elapsed());
+  compareArrays(ref_barOut, barOut, N);
   
   printf("fooCpu(): %g ms elapsed.\n", fooCpuTimer.Elapsed());
   printf("barCpu(): %g ms elapsed.\n", barCpuTimer.Elapsed());
