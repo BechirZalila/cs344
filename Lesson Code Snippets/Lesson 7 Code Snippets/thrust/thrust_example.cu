@@ -11,7 +11,7 @@
 int main(void)
 {
   // generate N random numbers serially
-  int N = 100000;
+  int N = 10000000;
   thrust::host_vector<char> h_vec(N);
   std::generate(h_vec.begin(), h_vec.end(), rand);
 
