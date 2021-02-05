@@ -19,11 +19,16 @@ const int N 	    = BLOCKSIZE*NUMBLOCKS;
  * 2 elements)
  */
 
-__global__ void foo(float out[], float A[], float B[], float C[], float D[], float E[]){
+__global__ void foo(float out[], float A[], float B[], float C[], float D[], float E[]){  
+  int i = threadIdx.x + blockIdx.x*blockDim.x;
+  __shared__ float tile [128];
+
+  // Copy input to tile
+
+  tile [threadIdx.x] = A[i] + B[i] + C[i] + D[i] + E[i];
+  __syncthreads ();
   
-  int i = threadIdx.x + blockIdx.x*blockDim.x; 
-  
-  out[i] = (A[i] + B[i] + C[i] + D[i] + E[i]) / 5.0f;
+  out[i] = tile[threadIdx.x] / 5.0f;
 }
 
 __global__ void bar(float out[], float in[]) 
