@@ -114,6 +114,6 @@ int main(int argc, char **argv)
 	       barTimer.Elapsed());
 	compareArrays(ref_barOut, barOut, N);
 
-	printf("fooCpu(): %g ms elapsed.\n", fooCPuTimer.Elapsed());
-	printf("barCpu(): %g ms elapsed.\n", barCPuTimer.Elapsed());
+	printf("fooCpu(): %g ms elapsed.\n", fooCpuTimer.Elapsed());
+	printf("barCpu(): %g ms elapsed.\n", barCpuTimer.Elapsed());
 }
