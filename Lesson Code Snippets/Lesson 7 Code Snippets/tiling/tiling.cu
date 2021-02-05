@@ -2,7 +2,7 @@
 #include "gputimer.h"
 #include "utils.h"
 
-const int BLOCKSIZE	= 128;
+const int BLOCKSIZE = 128;
 const int NUMBLOCKS = 1000;					// set this to 1 or 2 for debugging
 const int N 		= BLOCKSIZE*NUMBLOCKS;
 
