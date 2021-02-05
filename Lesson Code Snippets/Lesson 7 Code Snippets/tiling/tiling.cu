@@ -21,6 +21,12 @@ const int N 	    = BLOCKSIZE*NUMBLOCKS;
 
 __global__ void foo(float out[], float A[], float B[], float C[], float D[], float E[]){  
   int i = threadIdx.x + blockIdx.x*blockDim.x;
+
+  out[i] = (A[i] + B[i] + C[i] + D[i] + E[i]) / 5.0f;
+}
+
+__global__ void foo_tile(float out[], float A[], float B[], float C[], float D[], float E[]){  
+  int i = threadIdx.x + blockIdx.x*blockDim.x;
   int x = threadIdx.x;
   __shared__ float tile [128];
 
@@ -33,6 +39,13 @@ __global__ void foo(float out[], float A[], float B[], float C[], float D[], flo
 }
 
 __global__ void bar(float out[], float in[]) 
+{
+  int i = threadIdx.x + blockIdx.x*blockDim.x;
+  
+  out[i] = (in[i-2] + in[i-1] + in[i] + in[i+1] + in[i+2]) / 5.0f;
+}
+
+__global__ void bar_tile(float out[], float in[]) 
 {
   int i = threadIdx.x + blockIdx.x*blockDim.x;
   int x = threadIdx.x;
