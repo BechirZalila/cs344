@@ -84,9 +84,16 @@ int main(int argc, char **argv)
 	cudaMalloc(&d_barOut, numBytes);
 
 	// declare and compute reference solutions
-	float ref_fooOut[N], ref_barOut[N]; 
+	float ref_fooOut[N], ref_barOut[N];
+	GpuTimer fooCpuTimer, barCpuTimer;
+
+	fooCpuTimer.Start();
 	cpuFoo(ref_fooOut, fooA, fooB, fooC, fooD, fooE);
+	fooCpuTimer.Stop();
+
+	barCpuTimer.Start();
 	cpuBar(ref_barOut, barIn);
+	barCpuTimer.Stop();
 
 	// launch and time foo and bar
 	GpuTimer fooTimer, barTimer;
@@ -100,8 +107,13 @@ int main(int argc, char **argv)
 
 	cudaMemcpy(fooOut, d_fooOut, numBytes, cudaMemcpyDeviceToHost);
 	cudaMemcpy(barOut, d_barOut, numBytes, cudaMemcpyDeviceToHost);
-	printf("foo<<<>>>(): %g ms elapsed. Verifying solution...", fooTimer.Elapsed());
+	printf("foo<<<>>>(): %g ms elapsed. Verifying solution...",
+	       fooTimer.Elapsed());
 	compareArrays(ref_fooOut, fooOut, N);
-	printf("bar<<<>>>(): %g ms elapsed. Verifying solution...", barTimer.Elapsed());
+	printf("bar<<<>>>(): %g ms elapsed. Verifying solution...",
+	       barTimer.Elapsed());
 	compareArrays(ref_barOut, barOut, N);
+
+	printf("fooCpu(): %g ms elapsed.\n", fooCPuTimer.Elapsed());
+	printf("barCpu(): %g ms elapsed.\n", barCPuTimer.Elapsed());
 }
