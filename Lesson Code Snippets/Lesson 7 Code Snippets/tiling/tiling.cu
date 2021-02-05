@@ -128,16 +128,17 @@ int main(int argc, char **argv)
   foo<<<N/BLOCKSIZE, BLOCKSIZE>>>
     (d_fooOut, d_fooA, d_fooB, d_fooC, d_fooD, d_fooE);
   fooTimer.Stop();
+
+  cudaMemcpy(fooOut, d_fooOut, numBytes, cudaMemcpyDeviceToHost);
+  printf("foo<<<>>>(): %g ms elapsed. Verifying solution...",
+	 fooTimer.Elapsed());
+  compareArrays(ref_fooOut, fooOut, N);
   
   barTimer.Start();
   bar<<<N/BLOCKSIZE, BLOCKSIZE>>>(d_barOut, d_barIn);
   barTimer.Stop();
   
-  cudaMemcpy(fooOut, d_fooOut, numBytes, cudaMemcpyDeviceToHost);
   cudaMemcpy(barOut, d_barOut, numBytes, cudaMemcpyDeviceToHost);
-  printf("foo<<<>>>(): %g ms elapsed. Verifying solution...",
-	 fooTimer.Elapsed());
-  compareArrays(ref_fooOut, fooOut, N);
   printf("bar<<<>>>(): %g ms elapsed. Verifying solution...",
 	 barTimer.Elapsed());
   compareArrays(ref_barOut, barOut, N);
