@@ -36,15 +36,15 @@ __global__ void bar(float out[], float in[])
 {
   int i = threadIdx.x + blockIdx.x*blockDim.x;
   int x = threadIdx.x;
-  __shared__ float tile [128];
+  //  __shared__ float tile [128];
 
   // Copy input to tile
 
-  tile [x] = in[i];
-  __syncthreads();
+  //tile [x] = in[i];
+  //__syncthreads();
   
-  //out[i] = (in[i-2] + in[i-1] + in[i] + in[i+1] + in[i+2]) / 5.0f;
-  out[i] = (tile[x-2] + tile[x-1] + tile[x] + tile[x+1] + tile[x+2]) / 5.0f;
+  out[i] = (in[i-2] + in[i-1] + in[i] + in[i+1] + in[i+2]) / 5.0f;
+  //out[i] = (tile[x-2] + tile[x-1] + tile[x] + tile[x+1] + tile[x+2]) / 5.0f;
 }
 
 void cpuFoo(float out[], float A[], float B[], float C[], float D[], float E[])
