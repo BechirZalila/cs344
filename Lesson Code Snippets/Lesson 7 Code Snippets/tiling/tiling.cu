@@ -49,15 +49,25 @@ __global__ void bar_tile(float out[], float in[])
 {
   int i = threadIdx.x + blockIdx.x*blockDim.x;
   int x = threadIdx.x;
-  __shared__ float tile [128];
+  __shared__ float tile [128 + 4];
 
   // Copy input to tile
 
-  tile [x] = in[i];
+  tile [x + 2] = in[i];
+  if (x == 0) {
+    tile[x] = in[i-2];
+    tile[x+1] = in[i-1];
+  }
+  else if (x == blockDim.x - 1) {
+    tile[x + 3] = in[i+1];
+    tilie[x + 4] = in[i+2];
+  }
+
   __syncthreads();
   
-  out[i] = (in[i-2] + in[i-1] + in[i] + in[i+1] + in[i+2]) / 5.0f;
-  //out[i] = (tile[x-2] + tile[x-1] + tile[x] + tile[x+1] + tile[x+2]) / 5.0f;
+  //out[i] = (in[i-2] + in[i-1] + in[i] + in[i+1] + in[i+2]) / 5.0f;
+  out[i] = (tile[x] + tile[x + 1] + tile[x + 2] + tile[x + 3] + tile[x + 4]) / 5.0f;
+
 }
 
 void cpuFoo(float out[], float A[], float B[], float C[], float D[], float E[])
