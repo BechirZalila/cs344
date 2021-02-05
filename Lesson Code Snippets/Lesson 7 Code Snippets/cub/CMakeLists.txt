@@ -17,5 +17,5 @@ include_directories(${CUDA_INCLUDE_DIRS})
 
 file(GLOB cu example_block_scan_cum.cu)
 
-add_executable(example_block_scan_cum.cu ${cu})
+add_executable(example_block_scan_cum ${cu})
 
