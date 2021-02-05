@@ -154,11 +154,11 @@ int main(int argc, char **argv)
   compareArrays(ref_barOut, barOut, N);
 
   barTimer.Start();
-  bar_tiled<<<N/BLOCKSIZE, BLOCKSIZE>>>(d_barOut, d_barIn);
+  bar_tile<<<N/BLOCKSIZE, BLOCKSIZE>>>(d_barOut, d_barIn);
   barTimer.Stop();
   
   cudaMemcpy(barOut, d_barOut, numBytes, cudaMemcpyDeviceToHost);
-  printf("bar_tiled<<<>>>(): %g ms elapsed. Verifying solution...",
+  printf("bar_tile<<<>>>(): %g ms elapsed. Verifying solution...",
 	 barTimer.Elapsed());
   compareArrays(ref_barOut, barOut, N);
   
