@@ -55,7 +55,7 @@ __global__ void smooth_shared(float * v_new, const float * v) {
 int main(int argc, char **argv)
 {
 
-    const int ARRAY_SIZE = 4096;
+  const int ARRAY_SIZE = 8192;//4096;
     const int BLOCK_SIZE = 256;
     const int ARRAY_BYTES = ARRAY_SIZE * sizeof(float);
 
