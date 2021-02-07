@@ -20,7 +20,15 @@ __global__ void smooth(float * v_new, const float * v) {
 __global__ void smooth_shared(float * v_new, const float * v) {
     extern __shared__ float s[];
     // TODO: Fill in the rest of this function
-    //return v[0];
+
+    int myIdx = threadIdx.x * gridDim.x + blockIdx.x;
+    int numThreads = blockDim.x * gridDim.x;
+    int myLeftIdx = (myIdx == 0) ? 0 : myIdx - 1;
+    int myRightIdx = (myIdx == (numThreads - 1)) ? numThreads - 1 : myIdx + 1;
+    float myElt = v[myIdx];
+    float myLeftElt = v[myLeftIdx];
+    float myRightElt = v[myRightIdx];
+    v_new[myIdx] = 0.25f * myLeftElt + 0.5f * myElt + 0.25f * myRightElt;
 }
 
 int main(int argc, char **argv)
