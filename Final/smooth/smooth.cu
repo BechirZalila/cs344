@@ -90,18 +90,16 @@ int main(int argc, char **argv)
     // cudaEventCreate(&stop);
     // launch the kernel
     GpuTimer timer1, timer2;
-
-    timer2.Start();
-    smooth_shared<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE, (BLOCK_SIZE + 2) * sizeof(float)>>>(d_out_shared, d_in);
-    timer2.Stop();
-    printf("Your code executed in %g ms\n", timer2.Elapsed());
     
     timer1.Start();
     smooth<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE>>>(d_out, d_in);
     timer1.Stop();
     printf("Slow code executed in %g ms\n", timer1.Elapsed());
     
-    
+    timer2.Start();
+    smooth_shared<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE, (BLOCK_SIZE + 2) * sizeof(float)>>>(d_out_shared, d_in);
+    timer2.Stop();
+    printf("Your code executed in %g ms\n", timer2.Elapsed());
 
     printf ("Ratio: %g\n", timer2.Elapsed() / timer1.Elapsed());
     
