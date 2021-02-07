@@ -20,7 +20,7 @@ __global__ void smooth(float * v_new, const float * v) {
 __global__ void smooth_shared(float * v_new, const float * v) {
     extern __shared__ float s[];
     // TODO: Fill in the rest of this function
-    return v[0];
+    //return v[0];
 }
 
 int main(int argc, char **argv)
