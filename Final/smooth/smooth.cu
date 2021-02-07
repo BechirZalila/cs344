@@ -44,7 +44,7 @@ __global__ void smooth_shared(float * v_new, const float * v) {
 
     if (myIdx <= 2) {
       printf ("###\n%d %d %d\n%d\n%d %d %d\n0.25*%f + 0.5*%f + 0.25*%f = %f\n###\n",
-	      threadIdx.x, blockIdx.x, blockDIm.x,
+	      threadIdx.x, blockIdx.x, blockDim.x,
 	      localIdx,
 	      myLeftIdx, myIdx, myRightIdx,
 	      myLeftElt, myElt, myRightElt, v_new[myIdx]);
