@@ -32,10 +32,10 @@ __global__ void smooth_shared(float * v_new, const float * v) {
     // corresponding to the current block surrounded by the preceding
     // and successing elements.
     
-    // s [localIdx + 1] = v [myIdx];
-    // if (localIdx == 0) {s [0] = v [myLeftIdx];}
-    // if (localIdx == blockDim.x - 1) {s [blockDim.x + 1] = v[myRightIdx];}
-
+    s [localIdx + 1] = v [myIdx];
+    if (localIdx == 0) {s [0] = v [myLeftIdx];}
+    if (localIdx == blockDim.x - 1) {s [blockDim.x + 1] = v[myRightIdx];}
+    
     __syncthreads();
     
     // float myElt = s[localIdx + 1];
