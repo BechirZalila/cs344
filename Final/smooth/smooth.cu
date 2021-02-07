@@ -68,8 +68,13 @@ int main(int argc, char **argv)
     // cudaEventCreate(&start);
     // cudaEventCreate(&stop);
     // launch the kernel
-    smooth<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE>>>(d_out, d_in);
     GpuTimer timer;
+    timer.Start();
+    smooth<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE>>>(d_out, d_in);
+    timer.Stop();
+
+    printf("Slow code executed in %g ms\n", timer.Elapsed());
+    
     timer.Start();
     smooth_shared<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE, (BLOCK_SIZE + 2) * sizeof(float)>>>(d_out_shared, d_in);
     timer.Stop();
