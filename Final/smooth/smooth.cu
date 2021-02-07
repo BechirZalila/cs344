@@ -43,7 +43,7 @@ __global__ void smooth_shared(float * v_new, const float * v) {
     float myRightElt = s[localIdx + 2];
     v_new[myIdx] = 0.25f * myLeftElt + 0.5f * myElt + 0.25f * myRightElt;
 
-    if (myId == 0) {
+    if (myIdx == 0) {
       printf ("0.25*%f + 0.5*%f + 0.25*%f = %f\n", myLeftElt, myElt, myRightElt, v_new[myIdx]);
     }
 }
