@@ -21,10 +21,23 @@ __global__ void smooth_shared(float * v_new, const float * v) {
     extern __shared__ float s[];
     // TODO: Fill in the rest of this function
 
+
+    int localIdx = threadIdx.x;
     int myIdx = threadIdx.x * gridDim.x + blockIdx.x;
     int numThreads = blockDim.x * gridDim.x;
     int myLeftIdx = (myIdx == 0) ? 0 : myIdx - 1;
     int myRightIdx = (myIdx == (numThreads - 1)) ? numThreads - 1 : myIdx + 1;
+
+    // Fill the shared variable with the elements of the array
+    // corresponding to the current block surrounded by the preceding
+    // and successing elements.
+    
+    s [localIdx + 1] = v [myIdx];
+    if (localIdx == 0) {s [0] = v [myLeftIdx];}
+    if (localIdx == blockDim.x - 1) {s [blockDim.x + 1] = v[myRightIdx];}
+
+    __syncthreads();
+    
     float myElt = v[myIdx];
     float myLeftElt = v[myLeftIdx];
     float myRightElt = v[myRightIdx];
