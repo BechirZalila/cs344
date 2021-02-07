@@ -40,14 +40,14 @@ __global__ void smooth_shared(float * v_new, const float * v) {
     // float myElt = s[localIdx + 1];
     // float myLeftElt = s[localIdx];
     // float myRightElt = s[localIdx + 2];
-    // v_new[myIdx] = 0.25f * myLeftElt + 0.5f * myElt + 0.25f * myRightElt;
     float myElt = v[myIdx];
     float myLeftElt = v[myLeftIdx];
     float myRightElt = v[myRightIdx];
     v_new[myIdx] = 0.25f * myLeftElt + 0.5f * myElt + 0.25f * myRightElt;
 
     if (myIdx <= 2) {
-      printf ("###\n%d\n%d %d %d\n0.25*%f + 0.5*%f + 0.25*%f = %f\n###\n",
+      printf ("###\n%d %d %d %d\n%d\n%d %d %d\n0.25*%f + 0.5*%f + 0.25*%f = %f\n###\n",
+	      threadIdx.x, blockIdx.x, blockDim.x, gridDim.x,
 	      localIdx,
 	      myLeftIdx, myIdx, myRightIdx,
 	      myLeftElt, myElt, myRightElt, v_new[myIdx]);
