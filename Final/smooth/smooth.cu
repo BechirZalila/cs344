@@ -22,7 +22,8 @@ __global__ void smooth_shared(float * v_new, const float * v) {
     // TODO: Fill in the rest of this function
 
     int localIdx = threadIdx.x;
-    int myIdx = threadIdx.x * gridDim.x + blockIdx.x;
+    int myIdx = threadIdx.x + blockIdx.x * blockDim.x;
+    //int myIdx = threadIdx.x * gridDim.x + blockIdx.x;
     int numThreads = blockDim.x * gridDim.x;
     int myLeftIdx = (myIdx == 0) ? 0 : myIdx - 1;
     int myRightIdx = (myIdx == (numThreads - 1)) ? numThreads - 1 : myIdx + 1;
