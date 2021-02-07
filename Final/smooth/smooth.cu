@@ -38,9 +38,9 @@ __global__ void smooth_shared(float * v_new, const float * v) {
 
     __syncthreads();
     
-    float myElt = v[myIdx];
-    float myLeftElt = v[myLeftIdx];
-    float myRightElt = v[myRightIdx];
+    float myElt = s[myIdx + 1];
+    float myLeftElt = s[myIdx];
+    float myRightElt = s[myIdx + 2];
     v_new[myIdx] = 0.25f * myLeftElt + 0.5f * myElt + 0.25f * myRightElt;
 }
 
