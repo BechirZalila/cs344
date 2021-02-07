@@ -55,7 +55,7 @@ __global__ void smooth_shared(float * v_new, const float * v) {
 int main(int argc, char **argv)
 {
 
-  const int ARRAY_SIZE = 8192;//4096;
+    const int ARRAY_SIZE = 4096;
     const int BLOCK_SIZE = 256;
     const int ARRAY_BYTES = ARRAY_SIZE * sizeof(float);
 
@@ -76,7 +76,6 @@ int main(int argc, char **argv)
 
     // declare GPU memory pointers
     float * d_in, * d_out, * d_out_shared;
-    int counter, n_iter = 100;
 
     // allocate GPU memory
     cudaMalloc((void **) &d_in, ARRAY_BYTES);
@@ -92,20 +91,16 @@ int main(int argc, char **argv)
     // launch the kernel
     GpuTimer timer;
     timer.Start();
-    for (counter = 0; counter < n_iter; counter++){
-      smooth<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE>>>(d_out, d_in);
-    }
+    smooth<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE>>>(d_out, d_in);
     timer.Stop();
 
-    printf("Slow code executed in %g ms\n", timer.Elapsed() / n_iter);
+    printf("Slow code executed in %g ms\n", timer.Elapsed());
     
     timer.Start();
-    for (counter = 0; counter < n_iter; counter++){
-      smooth_shared<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE, (BLOCK_SIZE + 2) * sizeof(float)>>>(d_out_shared, d_in);
-    }
+    smooth_shared<<<ARRAY_SIZE / BLOCK_SIZE, BLOCK_SIZE, (BLOCK_SIZE + 2) * sizeof(float)>>>(d_out_shared, d_in);
     timer.Stop();
 
-    printf("Your code executed in %g ms\n", timer.Elapsed() / n_iter);
+    printf("Your code executed in %g ms\n", timer.Elapsed());
     // cudaEventSynchronize(stop);
     // float elapsedTime;
     // cudaEventElapsedTime(&elapsedTime, start, stop);    
